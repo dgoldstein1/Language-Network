@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      prefix="og: http://opengraphprotocol.org/schema/ fb: http://www.facebook.com/2010/fbml d: http://dictionary.com/2011/dml">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <base href="http://www.thesaurus.com/">
+        <title>Test Synonyms, Test Antonyms | Thesaurus.com</title>
+        <script type="text/javascript">
+    var cookiesManager = function (){
+        'use strict';
+
+        var persistentValues = [];
+
+        return {
+            getCookieValue : function(name) {
+                var value = null,
+                    cookies = document.cookie,
+                    searchedCookie = cookies.indexOf(" " + name + "=");
+
+                // it's worth to check, if cookie is not first cookie
+                if (searchedCookie === -1) {
+                    var checkFirstCookie = cookies.indexOf(name + "=");
+                    searchedCookie = checkFirstCookie == 0 ? 0 : -1;
+                }
+
+                if (searchedCookie > -1) {
+                    var startPositionOfValue = cookies.indexOf("=", searchedCookie) + 1,
+                        endPositionOfValue = cookies.indexOf(";", searchedCookie);
+
+                    if (endPositionOfValue === -1) {
+                        endPositionOfValue = searchedCookie.length;
+                    }
+
+                    value = cookies.substring(startPositionOfValue,endPositionOfValue);
+                }
+
+                return value;
+            },
+
+            setCookie: function(name, value, hours, domain) {
+                var expires = '',
+                    domain  = domain || UrlHelper.getCurrentDomain();
+
+                if(hours !== undefined) {
+                    var now     = new Date(),
+                        time    = now.getTime();
+
+                    time += (3600 * hours) * 1000;
+                    now.setTime(time);
+
+                    expires = ';expires=' + now.toGMTString();
+                }
+
+                document.cookie =
+                    name + '=' + value +
+                        expires +
+                        ';path=/' +
+                        ';domain=' + domain;
+            },
+
+            /*
+            * This method ensures, that everywhere on the page value of cookie will be the same.
+            * It's important in case of cookie, which value can change across the page.
+            */
+            getPersistentCookieValue: function(name) {
+                if (typeof persistentValues[name] === 'undefined') {
+                    persistentValues[name] = this.getCookieValue(name);
+                    // after reading value, cookie has to be removed
+                    this.setCookie(name, null, -1);
+                }
+
+                return persistentValues[name];
+            }
+        }
+    }();
+</script><script type="text/javascript">
+    /*jslint browser: true */
+
+    var UrlHelper = function() {
+        var COOKIE_DOMAIN_THESAURUS     = '.thesaurus.com';
+        var COOKIE_DOMAIN_DICTIONARY    = '.dictionary.com';
+        var COOKIE_DOMAIN_REFERENCE     = '.reference.com';
+
+        var domain = null;
+        var currentURL = null;
+        var spanidsUrl = null;
+
+        function getSpanidsUrl(bid, sid, currentDomain) {
+            var url     = 'http://';
+            var source  = '';
+
+            if(currentDomain == COOKIE_DOMAIN_DICTIONARY) {
+                url += 'spanids.reference.com/?';
+                source = 'd';
+            } else if (currentDomain == COOKIE_DOMAIN_REFERENCE){
+                url += 'spanids.dictionary.com/?';
+                source = 'r';
+            } else {
+                url += 'spanids.dictionary.com/?';
+                source = 't';
+            }
+
+            url += 'bid=' + bid + '&asid=' + sid + '&bidnew=1&asidnew=1&source=' + source + '&site=app';
+
+
+            return url;
+        }
+
+        function getCurrentDomain() {
+            var host = window.location.host;
+            var value = "";
+            if(host.indexOf(COOKIE_DOMAIN_THESAURUS) > -1) {
+                value = COOKIE_DOMAIN_THESAURUS;
+            } else if(host.indexOf(COOKIE_DOMAIN_DICTIONARY) > -1) {
+                value = COOKIE_DOMAIN_DICTIONARY;
+            } else if(host.indexOf(COOKIE_DOMAIN_REFERENCE) > -1){
+                value = COOKIE_DOMAIN_REFERENCE;
+            }
+
+            return value;
+        }
+
+        return {
+            getCurrentDomain : function() {
+                if(domain === null) {
+                    domain = getCurrentDomain();
+                }
+                return domain;
+            },
+
+            getCurrentDomainFromRequest : function() {
+                return window.location.host;
+            },
+
+            getCurrentUrl : function() {
+                if(currentURL === null) {
+                    currentURL = window.location.protocol + "//" + window.location.host + "" + window.location.pathname;
+                }
+                return currentURL;
+            },
+
+            getSpanidsUrl : function(bid, sid, domain) {
+                if(spanidsUrl === null) {
+                    spanidsUrl = getSpanidsUrl(bid, sid, domain);
+                }
+
+                return spanidsUrl;
+            }
+        }
+    }();
+</script><script type="text/javascript">
+    var BidSidGenerator = (function () {
+        'use strict';
+        var COOKIE_NAME_BID = 'bid',
+            COOKIE_NAME_SID = 'sid',
+            COOKIE_NAME_SPANIDS = 'spanids',
+            COOKIE_BID_EXPIRES = 17520, //two years
+            COOKIE_SID_EXPIRES = 0.5, //half an hour
+            bidCookieValue = null,
+            sidCookieValue = null,
+            bidCookieCreated = false,
+            sidCookieCreated = false,
+            spanIdsCookiePresent = false;
+
+        // generates value of bid/sid cookie
+        function generateCookieValue() {
+            var max = 999999,
+                min = 100000,
+                rand = Math.floor(Math.random() * (max - min)) + min,
+                time = new Date().getTime();
+
+            return rand + "-" + time;
+        }
+
+        // sets value of spanIdsCookiePresent attribute to true and delete spanids cookie,
+        // if cookie exist and have appropriate value
+        function processSpanIdsCookie() {
+            var spanIdsValue = cookiesManager.getCookieValue(COOKIE_NAME_SPANIDS);
+
+            if(spanIdsValue === '1') {
+                cookiesManager.setCookie(COOKIE_NAME_SPANIDS, 0, -1); //removes spanids cookie
+                spanIdsCookiePresent = true;
+            }
+
+            return false;
+        }
+
+        return {
+            init: function () {
+                bidCookieValue  = cookiesManager.getCookieValue(COOKIE_NAME_BID);
+                sidCookieValue  = cookiesManager.getCookieValue(COOKIE_NAME_SID);
+
+                if (bidCookieValue == null || bidCookieValue.length == 0) {
+                    bidCookieValue = generateCookieValue();
+                    cookiesManager.setCookie(COOKIE_NAME_BID, bidCookieValue, COOKIE_BID_EXPIRES);
+                    bidCookieCreated = true;
+                }
+
+                if (sidCookieValue == null || sidCookieValue.length == 0) {
+                    sidCookieValue = generateCookieValue();
+                    sidCookieCreated = true;
+                }
+
+                processSpanIdsCookie();
+                cookiesManager.setCookie(COOKIE_NAME_SID, sidCookieValue, COOKIE_SID_EXPIRES);
+            },
+            propagateCookies: function() {
+                if (bidCookieCreated || sidCookieCreated || spanIdsCookiePresent) {
+                    var url = UrlHelper.getSpanidsUrl(bidCookieValue, sidCookieValue, UrlHelper.getCurrentDomain()),
+                        iFrame = '<iframe id="spanids" style="width:1px;height:1px;margin-left:-1;position:absolute;border:none;" src="' + url + '"></iframe>';
+                    document.write(iFrame);
+                }
+            },
+            touchSidCookie: function () {
+                sidCookieValue  = cookiesManager.getCookieValue(COOKIE_NAME_SID);
+                if (sidCookieValue == null || sidCookieValue.length == 0) {
+                    sidCookieValue = generateCookieValue();
+                    sidCookieCreated = true;
+                }
+
+                cookiesManager.setCookie(COOKIE_NAME_SID, sidCookieValue, COOKIE_SID_EXPIRES);
+            },
+            isSidCookieCreated: function () {
+                return sidCookieCreated;
+            },
+            isSpanIdsCookiePresent: function () {
+                return spanIdsCookiePresent;
+            }
+        };
+    }());
+
+    BidSidGenerator.init();
+    BidSidGenerator.propagateCookies();
+</script>
+<script>
+    var DARCI = DARCI || {},
+        u = "http://track.thesaurus.com/main.gif?ev=ps&qr=%25%25QUERY%25%25&rf_qr=%25%25REFQUERY%25%25&pn=the&st=thes&ab=&dc=desktop",
+        s = location.search.match(new RegExp('[\?\&]s=([^\&]*)(\&?)', 'i')),
+        ms = (typeof ms === 'undefined') ? cookiesManager.getCookieValue('mseg') || "" : ms,
+
+        /**
+         * Because this file is added only in case when CSL is enabled,
+         * we can be sure cookieManager will be available.
+         */
+        refQuery = cookiesManager.getPersistentCookieValue('ReferrerQuery'),
+        query, orgQuery;
+
+    DARCI.SearchBoxClickLinkId = '205vpa';
+
+            orgQuery = typeof DARCI.OQR !== 'undefined' ? DARCI.OQR.getValue() : null;
+        query =  orgQuery !== null ? orgQuery : "test";
+
+        u = u.replace('%25%25QUERY%25%25', query);
+    
+
+    if (s != null && s[1]) {
+        if (s[1] == 't' || s[1] == 'ts' || s[1] == 'tn') {
+            var ev = u.indexOf('ev=');
+            if (ev !== -1) {
+                ev = ev + 3;
+                u = u.slice(0, ev) + 'c' + u.slice(ev) + '&cl=205vpa&sc=1';
+                u = u.replace('%25%25REFQUERY%25%25', refQuery);
+            }
+        }
+    }
+
+    new Image().src = u + "&ms=" + ms + "&rf=" + encodeURIComponent(document.referrer) + "&cb=" + Math.floor((Math.random() * 899999999) + 100000000);
+</script>
+<link rel="dns-prefetch" href="//www.googletagmanager.com" /><link rel="dns-prefetch" href="//ox-d.ask.servedbyopenx.com" /><link rel="dns-prefetch" href="//edge.quantserve.com" /><link rel="dns-prefetch" href="//c.amazon-adsystem.com" /><link rel="dns-prefetch" href="//partner.googleadservices.com" /><link rel="dns-prefetch" href="//aax.amazon-adsystem.com" /><link rel="dns-prefetch" href="//tpc.googlesyndication.com" /><link rel="dns-prefetch" href="//connect.facebook.net" /><link rel="dns-prefetch" href="//www.google-analytics.com" /><link rel="dns-prefetch" href="https://platform.twitter.com" /><script type="text/javascript">
+    var src = null;
+                        new Image().src = 'http://www.thesaurus.com/trc/img/serp/sprite-lowdpi-1c8ce.png';
+                                new Image().src = 'http://www.thesaurus.com/trc/img/topheavy_hdr_bg-49963.png';
+            </script><meta property="og:title" content="I found great synonyms for &quot;test&quot; on the new Thesaurus.com!" /><meta property="og:site_name" content="www.thesaurus.com" /><meta property="og:image" content="http://static.sfdict.com/thescloud/img/thesaurus_social_logo-208ba.png" /><meta property="fb:app_id" content="118269238218175" /><meta property="fb:admins" content="100000304287730,109125464873" /><meta name="msvalidate.01" content="DF5542D7723770377E9ABFF59AC1DC97" /><meta name="description" content="Synonyms for test at Thesaurus.com with free online thesaurus, antonyms, and definitions. Dictionary and Word of the Day." /><meta name="keywords" content="test,test synonyms,test antonyms,test thesaurus" /><link rel="shortcut icon" href="http://static.sfdict.com/thescloud/favicon.ico" /><link rel="apple-touch-icon-precomposed" href="http://static.sfdict.com/thescloud/img/touch_icon.png" /><link rel="search" type="application/opensearchdescription+xml" title="Dictionary.com" href="http://www.thesaurus.com/opensearch_desc.xml" /><link rel="next" href="http://www.thesaurus.com/browse/test/2" /><link rel="canonical" href="http://www.thesaurus.com/browse/test" /><link rel="stylesheet" href="http://www.thesaurus.com/trc/css/combinedSerpDesktop-17255.css" type="text/css" media="all" /><script type="text/javascript">
+    var _query = "test";var fby = fby || [];var searchURL = "http://www.thesaurus.com/browse/%40%40queryText%40%40?s=t";var pageName = "the";</script>
+<script type="text/javascript">
+    var UserController = function() {
+        var USER_STATUS_LOGGED_IN = 'L';
+        var USER_STATUS_NOT_LOGGED = 'N';
+
+        var USER_UNDER_13 = 'Y';
+        var USER_OVER_13 = 'N';
+
+        var COOKIE_NAME_SESS = 'sess';
+        var COOKIE_NAME_FAV = 'fav';
+        var COOKIE_NAME_SUPERSESS = 'ss';
+
+        var PREMIUM_STATUS_VALUE = 9;
+        var FAV_COOKIE_PREMIUM_STATUS_KEY = 0;
+        var FAV_COOKIE_FAV_COUNT_KEY = 1;
+        var FAV_COOKIE_USER_UNDER_13_KEY = 2;
+
+        var isLoggedIn = null;
+        var isPremium = null;
+        var isSuperSess = null;
+        var favNumber = null;
+        var isUnder13 = null;
+        var displayAds = null;
+
+        /**
+         * Checking if user is under 13 using value from fav cookie
+         * @returns {boolean}
+         */
+        function checkIsUserUnder13() {
+            if (isLoggedIn !== true) {
+                return false;
+            }
+
+            var isUnder13 = USER_OVER_13;
+            var favCookieValue = cookiesManager.getCookieValue(COOKIE_NAME_FAV);
+
+            if(favCookieValue != null) {
+                favCookieValue = decodeURIComponent(favCookieValue);
+                isUnder13 = favCookieValue.split('|')[FAV_COOKIE_USER_UNDER_13_KEY];
+            }
+
+            return isUnder13 === USER_UNDER_13;
+        }
+
+        function checkIsUserLoggedIn() {
+            var userStatus = USER_STATUS_NOT_LOGGED;
+            var sessCookieValue = cookiesManager.getCookieValue(COOKIE_NAME_SESS);
+
+            if(sessCookieValue != null) {
+                userStatus = sessCookieValue.charAt(0);
+            }
+
+            return userStatus === USER_STATUS_LOGGED_IN;
+        }
+
+        function checkIfUserIsPremium() {
+            var premiumStatus = null;
+            var favCookieValue = cookiesManager.getCookieValue(COOKIE_NAME_FAV);
+
+            if(favCookieValue != null) {
+                favCookieValue = decodeURIComponent(favCookieValue);
+                premiumStatus = favCookieValue.split('|')[FAV_COOKIE_PREMIUM_STATUS_KEY];
+            }
+
+            return premiumStatus == PREMIUM_STATUS_VALUE;
+        }
+
+        function getFavNum() {
+            var count = 0;
+            var favCookieValue = cookiesManager.getCookieValue(COOKIE_NAME_FAV);
+
+            if(favCookieValue != null) {
+                favCookieValue = decodeURIComponent(favCookieValue);
+                count = favCookieValue.split('|')[FAV_COOKIE_FAV_COUNT_KEY];
+            }
+
+            return count;
+        }
+
+
+        /**
+         * Checking super session cookie and calling ajax endpoint if cookie exists
+         * @returns {boolean}
+         */
+        function checkIfUserHasSuperSession() {
+            // get ss cookie value
+            var superSessionCookieValue = cookiesManager.getCookieValue(COOKIE_NAME_SUPERSESS);
+
+            // if there is ss cookie then make ajax (cors) call to check ss cookie and get response on callback
+            if(superSessionCookieValue !== null){
+
+                var xhr = createCORSRequest('GET', 'http://app.dictionary.com/supersession/check/' + superSessionCookieValue);
+
+                if (xhr){
+                    // Define a callback function
+                    xhr.onload = function(){
+                        var responseData = xhr.responseText;
+                        var data = JSON.parse(responseData);
+                        // process the response.
+
+                        // if response is null then do nothing
+                        if(data == null) {
+                            // do nothing
+                        } else {
+                            // otherwise set the session cookie
+                            cookiesManager.setCookie("sess", data['sessionCookie']);
+
+                            // change header appropriately
+                            changeBodyClassNameForUser();
+                        }
+                    };
+
+                    // Send request
+                    xhr.send();
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * A method to create cors request
+         * @param method
+         * @param url
+         * @returns {XMLHttpRequest}
+         */
+        function createCORSRequest(method, url) {
+            var xhr = new XMLHttpRequest();
+            if ("withCredentials" in xhr) {
+
+                // Check if the XMLHttpRequest object has a "withCredentials" property.
+                // "withCredentials" only exists on XMLHTTPRequest2 objects.
+                xhr.open(method, url, true);
+
+            } else if (typeof XDomainRequest != "undefined") {
+
+                // Otherwise, check if XDomainRequest.
+                // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
+                xhr = new XDomainRequest();
+                xhr.open(method, url);
+
+            } else {
+
+                // Otherwise, CORS is not supported by the browser.
+                xhr = null;
+
+            }
+
+            return xhr;
+        }
+
+        /**
+         * Checking user status and setting correct body className for user
+         */
+        function changeBodyClassNameForUser() {
+            if(isPremium)
+                document.body.className+=' premium';
+            if(isLoggedIn)
+                document.body.className+=' loggedin';
+            if(isUnder13)
+                document.body.className+=' isUnder13';
+        }
+
+        return {
+
+            initHead: function() {
+                isLoggedIn = checkIsUserLoggedIn();
+                isPremium = checkIfUserIsPremium();
+                isUnder13 = checkIsUserUnder13();
+            },
+
+            initBody: function(){
+                // on initialization check user status and change append body class name accordingly
+                changeBodyClassNameForUser();
+
+                // if the user is not logged in then check to see if the user has an ss cookie
+                if(isLoggedIn !== true) {
+                    // call function responsible for checking ss cookie and calling ajax endpoint
+                    isSuperSess = checkIfUserHasSuperSession();
+                }
+            },
+
+            isLoggedIn : function() {
+                return isLoggedIn;
+            },
+
+            isPremium : function() {
+                return isPremium
+            },
+
+            getFavNumber : function() {
+                if(favNumber === null) {
+                    favNumber = getFavNum();
+                }
+                return favNumber;
+            },
+
+            isUnder13 : function() {
+                return isUnder13;
+            },
+
+            shouldDisplayAds: function() {
+                if(displayAds === null) {
+                    displayAds = !isPremium && !checkIsUserUnder13();
+                }
+                return displayAds;
+            }
+        }
+
+
+    }();
+    UserController.initHead();
+</script>
+<script type="text/javascript">
+    var _sp_=function(n){function t(e){if(o[e])return o[e].exports;var r=o[e]={i:e,l:!1,exports:{}};return n[e].call(r.exports,r,r.exports,t),r.l=!0,r.exports}var o={};return t.m=n,t.c=o,t.i=function(n){return n},t.d=function(n,o,e){t.o(n,o)||Object.defineProperty(n,o,{configurable:!1,enumerable:!0,get:e})},t.n=function(n){var o=n&&n.__esModule?function(){return n["default"]}:function(){return n};return t.d(o,"a",o),o},t.o=function(n,t){return Object.prototype.hasOwnProperty.call(n,t)},t.p="",t(t.s=2)}([function(n,t,o){function e(n,t){r&&console[n].apply(console,["[bootstrap]"].concat(Array.prototype.slice.call(t)))}var r=(o(0),!1);n.exports={debug:function(){e("debug",arguments)},info:function(){e("info",arguments)},time:function(){e("time",arguments)},warn:function(){e("warn",arguments)},error:function(){e("error",arguments)},useDefaults:function(){r=!0},DEBUG:1}},function(n,t,o){"use strict";function e(){D||(D=!0,z=h.config=h.config||{},s(),N=z.bootstrap&&z.bootstrap.contentControlCallback||z.content_control_callback,B=z.accountId||z.account_id||z.client_id||window.sp_cid,G=z.beacon&&z.beacon.contentControlEndpoint||z.content_control_beacon_endpoint||v.a,z.debug_level&&"OFF"!==z.debug_level.toString().toUpperCase()||z.debug&&z.debug.level&&"OFF"!==z.debug.level.toString().toUpperCase()?q=!0:window.location.search&&null!=window.location.search.match(/_sp_debug_level=(?!off|OFF)/)&&(q=!0),q&&m.useDefaults({defaultLevel:m.DEBUG}))}function r(n,t,e){function r(o,e){var r=new Image;r.src="//"+G+"/cct?v="+encodeURIComponent(v.b)+"&ct="+_+"&cid="+encodeURIComponent(B)+"&l="+encodeURIComponent(n.toString())+"&rc="+encodeURIComponent(t)+"&d0="+encodeURIComponent(i)+(o?"&d1="+encodeURIComponent(o):"")+(e?"&d2="+encodeURIComponent(e):""),g.info("sending beacon: "+r.src),a&&a()}var i=arguments.length>3&&void 0!==arguments[3]?arguments[3]:"",c=arguments[4],a=arguments[5];if(c){var u=e.lastIndexOf("."),d=e.lastIndexOf("/"),s=-1===u||d>u?e+".png":e.substring(0,u)+".png",l=new Image;l.addEventListener("load",function(){r("1",s)}),l.addEventListener("error",function(){o.i(f.a)(s,function(n,t,o){r("0",s+"::"+o)})}),l.src=s}else r()}function i(n,t,o,e){var r=arguments.length>4&&void 0!==arguments[4]?arguments[4]:{},c=arguments.length>5&&void 0!==arguments[5]&&arguments[5],a=function(){i(n,t,o,e,r,!0)};n(t,c?o:a,e,r)}function c(n,t,o,e){function r(o,r){t(o,n,r,e.enableImageLoad)}function i(t,r){o(t,n,r,e.enableImageLoad),e.onError&&e.onError(r)}var c=document.createElement("script");c.src=n,c.onload=function(){e.onLoad&&e.onLoad()},c.onerror=function(){function t(n){return o.indexOf(n)>-1}var o=(navigator.userAgent||navigator.vendor||window.opera).toLowerCase();t("mobi")||t("ipad")||t("android")||t("iphone")?i(C):t("exabot")?i(k):t("bingbot")||t("bingpreview")?i(U):t("googlebot")||t("adsbot-google")||t("mediapartners-google")?i(I):t("googleweblight")?i(O):window.location.host===w?i(E):window.location.host.indexOf(b)>-1?i(j):t("msie 10")||t("msie 9")||t("msie 8")?i(S):a(n,r,i)},document.head.appendChild(c),document.querySelector('script[src="'+n+'"]')||-1!==window.location.host.indexOf(b)||(g.info("Script not present"),r(L,n))}function a(n,t,e){o.i(f.a)(n,function(o,r,i,c){(o||r?t:e)(c,n+"::"+i)})}function u(n,t,o,e){if(F)return void d(R+"::"+n,o);r(x,n,t,o,e,function(){if(N){if(q){g.error("bootstrap locking",x,n,t,o,e);debugger}setTimeout(function(){N()},250)}})}function d(n,t,o,e){r(y,n,t,o,e)}function s(){h._networkListenerData||(h._networkListenerData=o.i(p.a)())}function l(n,t){e(),g.info("bootstrap called with",n,t),i(c,n,u,d,t)}Object.defineProperty(t,"__esModule",{value:!0});var f=o(4),p=o(5),v=o(3),g=o(0),m=void 0;m=o(0);var w=["w","e","b","c","a","c","h","e",".","g","o","o","g","l","e","u","s","e","r","c","o","n","t","e","n","t",".","c","o","m"].join(""),b=["o","p","t","i","m","i","z","e","l","y","p","r","e","v","i","e","w",".","c","o","m"].join(""),h=window._sp_||{},_=1,y=0,x=1,L="s",C="m",I="g",E="gw",O="gl",S="i",U="b",k="e",R="n",j="o",D=!1,F=!1,q=!1,z=void 0,N=void 0,B=void 0,G=void 0;window.addEventListener("beforeunload",function(){F=!0}),window._sp_=h,h.setupNetworkListeners=s,h.bootstrap=l,window.spBootstrap=l,t["default"]=h},function(n,t,o){o(0);n.exports=o(1)["default"]},function(n,t,o){"use strict";function e(n){return n.join("")}o.d(t,"b",function(){return r}),o.d(t,"a",function(){return i});var r=(o(0),"2.0.926"),i=(e(["w","w","w",".","s","u","m","m","e","r","h","a","m","s","t","e","r",".","c","o","m"]),e(["w","w","w",".","r","o","o","s","t","e","r","f","i","r","e","w","o","r","k",".","c","o","m"]));e(["/","/","f","s","m","1","0","1","9",".","g","l","o","b","a","l",".","s","s","l",".","f","a","s","t","l","y",".","n","e","t","/","f","s","m","/","d","s"]),e(["h","t","t","p","s",":","/","/","d","2","z","v","5","r","k","i","i","4","6","m","i","q",".","c","l","o","u","d","f","r","o","n","t",".","n","e","t","/","0","/","2",".","0",".","9","2","6","/","r","e","c","o","v","e","r","y","_","d","f","p","_","i","n","t","e","r","n","a","l","-","v","2",".","0",".","9","2","6",".","j","s"]),e(["h","t","t","p","s",":","/","/","d","2","z","v","5","r","k","i","i","4","6","m","i","q",".","c","l","o","u","d","f","r","o","n","t",".","n","e","t","/","0","/","2",".","0",".","9","2","6","/","r","e","c","o","v","e","r","y","_","l","i","b","_","a","p","i","_","i","f","r","a","m","e","-","v","2",".","0",".","9","2","6",".","h","t","m","l"]),e(["h","t","t","p","s",":","/","/","d","2","z","v","5","r","k","i","i","4","6","m","i","q",".","c","l","o","u","d","f","r","o","n","t",".","n","e","t","/","0","/","2",".","0",".","9","2","6","/","r","e","c","o","v","e","r","y","_","l","i","b","_","r","i","d","_","i","f","r","a","m","e","-","v","2",".","0",".","9","2","6",".","h","t","m","l"])},function(n,t,o){"use strict";function e(n,t){function o(n){try{return n&&n.timeStamp?n.timeStamp:window.performance.now()}catch(n){return Date.now()}}var e=document.createElement("a");if(e.href=n,"https:"===window.location.protocol&&e.protocol!==window.location.protocol)return void t(!1,!1,e.protocol,u);var d=new XMLHttpRequest;try{d.open("GET",n)}catch(n){return void t(!0,!1,n.toString(),c,d)}var s=void 0,l=void 0;d.onloadstart=function(n){s=o(n)},d.onreadystatechange=function(n){if(4===this.readyState){l=o(n)-s;var e=0===this.status,c="2"===this.status.toString()[0],a=c?i:r;return void t(e,c,this.status+"::"+l,a,d)}};try{d.send()}catch(n){return void t(!0,!1,n.toString(),a,d)}}t.a=e;var r=(o(0),"n"),i="nx",c="xo",a="xs",u="p"},function(n,t,o){"use strict";function e(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:document,t=[],o=[],e=r.bind(null,t),i=r.bind(null,o);return n.addEventListener("load",e,!0),n.addEventListener("error",i,!0),{load:{events:t,listener:e},error:{events:o,listener:i}}}function r(n,t){if(t.target){var o="string"==typeof t.target.tagName?t.target.tagName.toLowerCase():"",e=t.target.src||"";"iframe"!==o&&n.push({tagName:o,src:e})}}t.a=e;o(0)}]);
+//# sourceMappingURL=https://s3.amazonaws.com/d3jlsadfjkuern/2.0.926/Ym9vdHN0cmFwLmpz.map
+    (function () {
+        
+window.DARCI = window.DARCI || {};
+window.DARCI.gptLoadedCallback = function () {
+window.gptLoaded = true;
+resetAndLoadGPTRecovery();
+};
+
+function resetAndLoadGPTRecovery() {
+if (gptLoaded && isBlocking) {
+resetGpt();
+window._sp_.dfp.loadGPT();
+}
+}
+
+function resetGpt () {
+googletag.cmd.push(function () {
+googletag.destroySlots();
+});
+
+if(typeof spots_deferred !== 'undefined') {
+for(var i in spots_deferred) spots_deferred[i].code = spots_deferred[i].code_sp;
+}
+
+window.googletag = {};
+window.googletag.cmd = [];
+window.googletag.slots = {};
+
+googletag.cmd.push(function () {
+googletag.slots["thesaurus_serp_atf_728x90"] = googletag.defineSlot("/23219321/iac.dict.thesrs.dw/dic/serp_0_y", [[728,90],[970,90], [970,250]], "thesaurus_serp_atf_728x90").addService(googletag.pubads()).setTargeting("pos", "top").setTargeting("pos2", "728x90_1").setTargeting("tx1", "results").setTargeting("tx2", "serp_0_y").setTargeting("ptype", "content").setTargeting("spe", "y");googletag.slots["thesaurus_serp_atf_300x250"] = googletag.defineSlot("/23219321/iac.dict.thesrs.dw/dic/serp_0_y", [[300,250],[300,600]], "thesaurus_serp_atf_300x250").addService(googletag.pubads()).setTargeting("pos", "top").setTargeting("pos2", "300x250_1").setTargeting("tx1", "results").setTargeting("tx2", "serp_0_y").setTargeting("ptype", "content").setTargeting("spe", "y");googletag.slots["thesaurus_serp_btf_2"] = googletag.defineSlot("/23219321/iac.dict.thesrs.dw/dic/serp_0_y", [728,90], "thesaurus_serp_btf_2").addService(googletag.pubads()).setTargeting("pos", "bot").setTargeting("pos2", "728x90_2").setTargeting("tx1", "results").setTargeting("tx2", "serp_0_y").setTargeting("ptype", "content").setTargeting("spe", "y");googletag.slots["thesaurus_serp_btf_300x252"] = googletag.defineSlot("/23219321/iac.dict.thesrs.dw/dic/serp_0_y", [300,250], "thesaurus_serp_btf_300x252").addService(googletag.pubads()).setTargeting("pos", "mid").setTargeting("pos2", "300x250_2").setTargeting("tx1", "results").setTargeting("tx2", "serp_0_y").setTargeting("ptype", "content").setTargeting("spe", "y");adStatus.renderedAdsCount = 0;
+adStatus.spotsCount = 4;
+googletag.pubads().addEventListener('slotRenderEnded', handleSlotRender);
+googletag.pubads().enableSingleRequest();
+googletag.enableServices();
+for(var i = 0; i < adStatus.displayedSpots.length; i++)
+    googletag.display(adStatus.displayedSpots[i]);
+});
+}
+        window._sp_ = window._sp_ || {};
+window._sp_.config = window._sp_.config || {};
+window._sp_.config.account_id = 294;
+window._sp_.config.publisher_base = '//spb.dictionary.com/proxy';
+window._sp_.config.gpt_auto_load = false;
+window._sp_.config.enable_rid = false;
+window._sp_.config.content_control_callback = function () {
+    window.location.href = "http://www.thesaurus.com/why-am-i-seeing-ads";
+};
+window._sp_.config.enable_vid= false;
+window._sp_.config.vid_control_callback = function() {
+    console.log("VID Triggered!");
+};
+
+document.addEventListener('sp.blocking', function (e) {
+isBlocking = true;
+resetAndLoadGPTRecovery();
+});
+
+        window._sp_.bootstrap('http://www.thesaurus.com/js/sp.js');
+
+    })();
+</script><script type="text/javascript">
+var get_request_identifier = (function () { return Math.random().toString(36).substr(2) }()),
+    get_modified_page_url = (function () {
+        sep = window.location.search.length >= 0 && window.location.href.indexOf("?") !== -1 ? "&" : "?";
+        return window.location.href + sep + "rquid=" + get_request_identifier
+    })();
+
+var ad_config = {
+    pageTargeting: {
+        ref: window.document.referrer.search("dictionary.com|thesaurus.com|reference.com") > -1 ? "organic" : "direct",
+        lang: window.navigator.userLanguage || window.navigator.language,
+        rpv: Math.floor((Math.random() * 100) + 1).toString(),
+        dc_ref: encodeURIComponent(get_modified_page_url),
+        loc: 'US',
+        ld: '0',
+        dow: new Date().getDay().toString(),
+        page_url: get_modified_page_url,
+        rquid: get_request_identifier,
+    }
+};
+ad_config.pageTargeting.tx1 = 'results';
+ad_config.pageTargeting.tx2 = 'serp_0_n';
+ad_config.pageTargeting.ptype = 'content';
+ad_config.pageTargeting.spe = 'n';
+ad_config.slots = [{"placement":"thesaurus_serp_atf_728x90","code":"\/23219321\/iac.dict.thesrs.dw\/dic\/serp_0_n","ad_uuid":"728x90_top","targeting":{"pos":"top","pos2":"728x90_1"},"sizes":[[728,90],[970,90],[970,250]]},{"placement":"thesaurus_serp_atf_300x250","code":"\/23219321\/iac.dict.thesrs.dw\/dic\/serp_0_n","ad_uuid":"300x250_top","targeting":{"pos":"top","pos2":"300x250_1"},"sizes":[[300,250],[300,600]]},{"placement":"thesaurus_serp_btf_2","code":"\/23219321\/iac.dict.thesrs.dw\/dic\/serp_0_n","ad_uuid":"728x90_bot","targeting":{"pos":"bot","pos2":"728x90_2"},"sizes":[[728,90]]},{"placement":"thesaurus_serp_btf_300x252","code":"\/23219321\/iac.dict.thesrs.dw\/dic\/serp_0_n","ad_uuid":"300x250_mid","targeting":{"pos":"mid","pos2":"300x250_2"},"sizes":[[300,250]]}];
+</script>
+<script type="text/javascript">
+var adStatus = {
+    spotsCount: 4,
+    renderedSpots: [],
+    renderedSpotsCount: 0,
+    displayedSpots: [],
+    set: function(name, size) {
+        this.renderedSpots[name] = {
+            size: size
+        };
+    },
+    get: function(name) {
+        return this.renderedSpots[name];
+    },
+    getSlotKey: function(slot) {
+        var slotKey;
+        for (slotKey in googletag.slots) {
+            if(googletag.slots[slotKey] == slot) {
+                break;
+            }
+        }
+        return slotKey;
+    },
+    adsLoaded: function() {
+        return this.renderedSpotsCount >= this.spotsCount;
+    }
+};
+
+adStatus.dispatchLoadedEvent = function () {
+    if(adStatus.adsLoaded()) {
+        if (document.createEvent) {
+            var event = new CustomEvent('gptAdsLoaded');
+            document.dispatchEvent(event);
+        } else {
+            var event = document.createEventObject();
+            event.eventType = "gptAdsLoaded";
+            document.fireEvent("ongptAdsLoaded", event);
+        }
+    }
+};
+
+var handleSlotRender = function(data) {
+    var key = adStatus.getSlotKey(data.slot);
+    adStatus.set(key, data.size);
+    adStatus.renderedSpotsCount += 1;
+        adStatus.dispatchLoadedEvent();
+    };
+</script><script type="text/javascript">
+var spots_deferred = [];
+</script>
+<script type="text/javascript">
+
+  var PWT = {}; //Initialize Namespace
+  var googletag = googletag || {},
+    DARCI = DARCI || {};
+
+  DARCI.PWTLoaded = false;
+  googletag.cmd = googletag.cmd || [];
+  googletag.slots = googletag.slots || {};
+
+  PWT.jsLoaded = function() { //PubMatic pwt.js on load callback is used to load GPT
+    window.OWT.registerExternalBidders(); // Notifies OpenWrap that there are some external bidders for which it has to wait before calling DFP.
+    (function() {
+      var gads = document.createElement('script');
+      var useSSL = 'https:' == document.location.protocol;
+      gads.src = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js';
+      var node = document.getElementsByTagName('script')[0];
+      node.parentNode.insertBefore(gads, node);
+      DARCI.PWTLoaded = true;
+      if (DARCI.enableGoogleInterstitial) {
+        var adsbygoogle = document.createElement('script');
+        adsbygoogle.async = true;
+        adsbygoogle.type = 'text/javascript';
+        adsbygoogle.src = '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+        var node = document.getElementsByTagName('script')[0];
+        node.parentNode.insertBefore(adsbygoogle, node);
+      }
+    })();
+  };
+
+  DARCI.configureApstagSpot = function(spot) {
+    if (typeof spot === 'undefined') {
+      return
+    }
+    var output = [];
+    output.push({
+      sizes: spot.sizes,
+      slotID: spot.placement
+    });
+    return output;
+  };
+
+  DARCI.loadDeferredAd = function(slot) {
+    if (typeof slot !== "object" && typeof slot.placement !== "string") {
+        return
+    }
+    
+    adStatus.displayedSpots.push(slot.placement);
+    googletag.cmd.push(function() {
+      googletag.slots[slot.placement] = googletag.defineSlot(slot.code, slot.sizes, slot.placement).addService(googletag.pubads());
+      for (target in slot.targeting) {
+        if (slot.targeting.hasOwnProperty(target)) {
+          googletag.slots[slot.placement].setTargeting(target, slot.targeting[target])
+        }
+      }
+      if (typeof(slot.sizeMapping) === 'function') {
+        googletag.slots[slot.placement].defineSizeMapping(slot.sizeMapping(googletag))
+      }
+      googletag.display(slot.placement);
+    });
+
+    if (typeof apstag !== "object") {
+      return
+    }
+
+    apstag.fetchBids({
+      slots: DARCI.configureApstagSpot(slot)
+    }, function() {
+      googletag.cmd.push(function() {
+        apstag.setDisplayBids();
+//        googletag.display(slot.placement);
+//        googletag.pubads().refresh([slot]);
+      });
+    });
+
+  };
+
+  (function() {
+    var purl = window.location.href;
+    var url = '//ads.pubmatic.com/AdServer/js/pwt/103207/307';
+    var profileVersionId = '';
+    if (purl.indexOf('pwtv=') > 0) {
+      var regexp = /pwtv=(.*?)(&|$)/g;
+      var matches = regexp.exec(purl);
+      if (matches.length >= 2 && matches[1].length > 0) {
+        profileVersionId = '/' + matches[1];
+      }
+    }
+    var wtads = document.createElement('script');
+    wtads.async = true;
+    wtads.type = 'text/javascript';
+    wtads.src = url + profileVersionId + '/pwt.js';
+    var node = document.getElementsByTagName('script')[0];
+    node.parentNode.insertBefore(wtads, node);
+  })();
+
+  /**---------- Set page level targeting for DFP ----------*/
+  for (var pageTarget in ad_config.pageTargeting) {
+    if (ad_config.pageTargeting.hasOwnProperty(pageTarget)) {
+      (function(key, value) {
+        googletag.cmd.push(function() {
+          googletag.pubads().setTargeting(key, value);
+        });
+      })(pageTarget, ad_config.pageTargeting[pageTarget]);
+    }
+  };
+
+  /**---------- Set ad slot level targeting for DFP ----------*/
+  if (typeof ad_config.slots === "object") {
+    ad_config.slots.forEach(function(slot, index) {
+      googletag.cmd.push(function() {
+        googletag.slots[slot.placement] = googletag.defineSlot(slot.code, slot.sizes, slot.placement).addService(googletag.pubads());
+        for (var target in slot.targeting) {
+          if (slot.targeting.hasOwnProperty(target)) {
+            googletag.slots[slot.placement].setTargeting(target, slot.targeting[target]);
+          }
+        }
+      });
+    });
+  }
+
+  /**---------- Push gpt ad slots to DFP ----------*/
+  googletag.cmd.push(function() {
+    googletag.pubads().enableSingleRequest();
+    googletag.enableServices();
+  });
+
+</script>
+
+<script type="text/javascript">
+var slotsObject = JSON.parse('[{"slotID":"thesaurus_serp_atf_728x90","sizes":[[728,90],[970,90],[970,250]]},{"slotID":"thesaurus_serp_atf_300x250","sizes":[[300,250],[300,600]]},{"slotID":"thesaurus_serp_btf_2","sizes":[[728,90]]},{"slotID":"thesaurus_serp_btf_300x252","sizes":[[300,250]]}]');
+
+!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function()
+{q("f",arguments)},setDisplayBids:function(){},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore( A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+// initialize apstag and have apstag set bids on the googletag slots when they are returned to the page
+apstag.init({
+  pubID: '3067',
+  adServer: 'googletag',
+  bidTimeout: 1000
+});
+
+// request the bids for the 3 googletag slots
+apstag.fetchBids({
+    slots: slotsObject
+}, function(bids) {
+  // Your callback method, in this example it triggers the first DFP request for googletag's disableInitialLoad integration after bids have been set
+  googletag.cmd.push(function(){
+    apstag.setDisplayBids();
+    if (typeof window.OWT === 'undefined') {
+      // googletag.pubads().refresh();
+    } else {
+      // This will tell OpenWrap that all the external bidders have returned bid.
+      window.OWT.notifyExternalBiddingComplete();
+    }
+  });
+});
+</script><script type='text/javascript'>
+    window.dataLayer = window.dataLayer || [];
+
+    dataLayer.push({
+        'event': 'pageview',
+        'device': 'Desktop',
+        'pageName': 'the',
+        'LDid': '0',
+        'mseg': cookiesManager.getCookieValue("mseg"),
+        'sessionId': cookiesManager.getCookieValue("sid"),
+        'browserId': cookiesManager.getCookieValue("bid")    });
+</script><!--[if lt IE 9]><script type="text/javascript" src="http://static.sfdict.com/app/js/html5-92a89.js" ></script><![endif]--><!-- Begin Quantcast Tag, part 1 -->
+<script type="text/javascript"> 
+  
+  var _qevents = _qevents || [];
+
+  (function() {
+   var elem = document.createElement('script');
+
+   elem.src = (document.location.protocol == "https:" ? "https://secure" : "http://edge") + ".quantserve.com/quant.js";
+   elem.async = true;
+   elem.type = "text/javascript";
+   var scpt = document.getElementsByTagName('script')[0];
+   scpt.parentNode.insertBefore(elem, scpt);  
+  })();
+</script>
+<!-- End Quantcast Tag, part 1 -->
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "WebPage",
+    "@id": "http://www.thesaurus.com/browse/test",
+    "potentialAction":
+    { "@type": "ViewAction", "target": "android-app://com.dictionary/http/www.thesaurus.com/browse/test" }
+}
+</script>    </head>
+    <body >
+            <!-- Google Tag Manager -->
+<noscript>
+    <iframe src="//www.googletagmanager.com/ns.html?id=GTM-PVMWP3" height="0" width="0" style="display:none;visibility:hidden">
+    </iframe>
+</noscript>
+<script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;
+        j.src= '//www.googletagmanager.com/gtm.js?id='+i+dl;
+        f.parentNode.insertBefore(j, f);
+    })(window,document,'script','dataLayer','GTM-PVMWP3');
+</script>
+<!-- End Google Tag Manager -->                <div id="fb-root"></div>
+            <!-- ClickTale Top part -->
+<script type="text/javascript">
+    var WRInitTime = (new Date()).getTime();
+</script>
+<!-- ClickTale end of Top part -->
+<script type="text/javascript">
+    UserController.initBody();
+</script>
+<script type="text/javascript">
+        /**
+     * Redirects user to address from parameter
+     *
+     * @param url
+     * @returns {boolean}
+     */
+    function submitForm(url) {
+        var queryText = document.getElementById('q').value || 'search';
+
+        queryText = encodeURIComponent(queryText);
+
+        url = url.replace('%40%40queryText%40%40', queryText);
+
+                location.href = url;
+        return false;
+    }
+
+    function prepareSearchBox(el) {
+        var dataTerm = el.getAttribute('data-term');
+        var value = el.value;
+        if (!(/(iPad|iPhone|iPod)/g.test(navigator.userAgent))) {
+            el.focus();
+            if (dataTerm == value) {
+                el.select();
+            }
+        }
+    }
+</script>
+<nav class="ham-nav">
+    <ul>
+        <li class="ham-main-menu"><a href="http://www.dictionary.com/" data-linkid="lxabec" >Dictionary.com</a></li>
+        <li>
+            <ul class="ham-submenu">
+                <li><a href="http://www.dictionary.com/wordoftheday/" data-linkid="1498ik" >Word <i class="wotd-italic">of the</i>  Day</a></li>
+                <li><a href="http://translate.reference.com/" data-linkid="au3zd1" >Translate</a></li>
+                <li><a href="http://www.dictionary.com/fun" data-linkid="yp2k17" >Games</a></li>
+                <li><a href="http://blog.dictionary.com/" data-linkid="t6ehki" >Blog</a></li>
+            </ul>
+        </li>
+                <li class="ham-main-menu">
+            <a href="http://app.dictionary.com/favorites">Favorites
+                <span class="dicticon-header-favourites-star"></span>
+                <span class="ham-favourites-number"></span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<button class="dicticon-hamburger-menu slide-element"></button>
+<header class="js-header thesaurus-header">
+    <div class="header-nav-row">
+        <ul class="header-main-nav">
+                            <li >
+                    <a href="http://www.dictionary.com/" data-linkid="tqks0v" >Dictionary.com</a>
+                </li>
+                            <li class="nav-active">
+                    <a href="http://www.thesaurus.com/" data-linkid="qxnxzj" >Thesaurus.com</a>
+                </li>
+                    </ul>
+        <ul class="header-login-nav">
+                            <li class="user-logged-in account"><a href="http://app.dictionary.com/users/settings">My Account</a></li>
+                <li class="user-logged-in"><a href="http://app.dictionary.com/logout?logindest=http%3A%2F%2Fwww.thesaurus.com%2Fbrowse%2Ftest%3Fs%3Dt">Log Out</a></li>
+                <li class="user-logged-out"><a rel="nofollow" href="http://app.dictionary.com/login?source=header_core&amp;logindest=http%3A%2F%2Fwww.thesaurus.com%2Fbrowse%2Ftest%3Fs%3Dt">Log In</a></li>
+                    </ul>
+
+    <a href="http://www.dictionary.com/apps"  class="header-apps-links" data-linkid="dbvvdc" >        <span class="dicticon-header-app-android"></span>
+        <span class="dicticon-header-app-ios"></span>
+        Try Our Apps
+        </a>
+    </div>
+
+    <div class="header-search-row">
+        <div class="header-wrapper-row">
+            <a href="http://www.thesaurus.com/" data-linkid="yg487x" >            <img src="http://www.thesaurus.com/trc/img/tcom-logo-b30fc.png" alt='Thesaurus.com'/>
+            </a>
+            <form id="main_search" class="header-search-form" action="http://www.thesaurus.com/search">
+                <div class="header-search-wrapper">
+                    <div class="search-filter-nav">
+                        <span class="dicticon-filter"></span>
+                        <span class="filter-item-active" data-filter-action="http://www.thesaurus.com/browse/%40%40queryText%40%40">synonyms</span>
+                    </div>
+                    <input type="text"
+                           value="test"
+                           autoComplete="off"
+                           autocapitalize="off"
+                           autocorrect="off"
+                           name="q"
+                           class="search-input transparent-text"
+                           id="q"
+                           data-term="test">
+                                        <input type="hidden" name="s" value="t"/>
+                    <button type="submit" id="search-submit" class="dicticon-search-submit" value=""></button>
+                    <ul class="filter-list filter-hidden">
+                                                    <li class="" data-filter="http://www.dictionary.com/browse/%40%40queryText%40%40">definitions</li>
+                                                    <li class="filter-hidden" data-filter="http://www.thesaurus.com/browse/%40%40queryText%40%40">synonyms</li>
+                                                    <li class="" data-filter="http://translate.reference.com/?query=%40%40queryText%40%40">translations</li>
+                                            </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="social-follow-module">
+    <ul class="social-follow-btns">
+        <li>
+            <div class="fb-like-wrapper">
+                <div class="fb-like" data-href="https://www.facebook.com/dictionarycom" data-layout="button_count" data-action="like" data-show-faces="true" data-share="false"></div>
+            </div>
+        </li>
+        <li>
+            <a class="twitter-follow-button" href="https://twitter.com/dictionarycom" data-show-screen-name="false">Follow @dictionarycom</a>
+        </li>
+        <li>
+            <span class="ig-follow" data-id="17031a6e93" data-handle="igfbdotcom" data-count="true" data-size="medium" data-username="false"></span>
+        </li>
+        <li>
+            <div class="g-follow" data-annotation="bubble" data-height="20" data-href="https://plus.google.com/117428481782081853923" data-rel="publisher"></div>
+        </li>
+    </ul>
+    <p>follow Dictionary.com</p>
+</div></header>
+<script type="text/javascript">
+    var DARCI = DARCI || {};
+    DARCI.searchedTerm = typeof DARCI.OQR !== 'undefined' ? DARCI.OQR.getValue() : null;
+    DARCI.searchedTerm = DARCI.searchedTerm !== null ? DARCI.searchedTerm : 'test';
+
+    document.getElementById('main_search').onsubmit = function(e, url) {
+        // if url parameter wasn't passed submitFrom() is called with default parameter, which is searchURL
+        // searchURL is defined and added as a global js option in controller
+        return submitForm(url || searchURL);
+    }
+
+    prepareSearchBox(document.getElementById('q'));
+
+    cookiesManager.setCookie('ReferrerQuery', DARCI.searchedTerm);
+</script><!-- main wrapper -->
+<!-- main wrapper -->
+<div id="container" class="container ">
+
+    <div id="heading">
+        <div id="fb-root"></div>
+<section id="breadcrumbs" class="breadcrumbs">
+    <div class="holder"  data-linkid='wd84go'>
+    </div>
+    <div class="prev-breadcrumbs adrefresh-mousedown">-</div>
+    <div class="next-breadcrumbs adrefresh-mousedown">+</div>
+    <section id="favor">
+        <a href="http://www.thesaurus.com/my-synonyms" data-linkid="kx52va" >My Synonyms</a>
+        <span>(<span class="count">0</span>)</span>
+    </section>
+</section>
+<!-- ad-top -->
+<section class="promo-top">
+    <div class="banner">
+        <div id="thesaurus_serp_atf_728x90">
+    <script type="text/javascript">
+        if (typeof UserController !== "undefined" && !UserController.shouldDisplayAds()) {
+            document.getElementById("thesaurus_serp_atf_728x90").parentNode.removeChild(document.getElementById(""));
+        } else {
+            adStatus.displayedSpots.push("thesaurus_serp_atf_728x90");
+            googletag.cmd.push(function () {
+                googletag.display("thesaurus_serp_atf_728x90");
+            });
+        }
+    </script>
+</div>    </div>
+</section>
+<!-- heading -->
+<div class="frame-holder">
+    <section class="main-heading">
+        <div class="part-of-speech">
+            <div class="main">
+                <h1>test</h1>
+                                    <div class="audio-wrapper cts-disabled">
+    <audio>
+        <source src="http://static.sfdict.com/audio/lunawav/T01/T0170800.ogg" type="audio/ogg">
+        <source src="http://static.sfdict.com/audio/T01/T0170800.mp3" type="audio/mpeg">
+    </audio>
+    <div class="speaker"></div>
+</div>                                        <div id="headword-star" class="star">star</div>
+                    <a href="http://www.dictionary.com/browse/test"  class="def"  target="_blank" data-linkid="k7mlp0" >                        see definition of <span class="headword">test</span></a>
+                                                                    <div class="part-of-speech-filter"  data-linkid='dzkc96'>
+                    show 
+                    <select id="part-of-speech-filter">
+                                                <option value="http://www.thesaurus.com/browse/test/" >all</option>
+                                                <option value="http://www.thesaurus.com/browse/test/noun" >noun</option>
+                                                <option value="http://www.thesaurus.com/browse/test/verb" >verb</option>
+                                        </select>
+                </div>
+                            </div>
+            <!-- words-gallery -->
+            <div id="words-gallery" class="words-gallery" style="display: none">
+                <div class="mask">
+                    <ul>
+                                                    <li>
+                                <a href="#" data-complbuckets="3" data-explore="analysis" data-syncount="47" data-thes-id="18297" data-id="0" id="pos-tab-0" class="pos-tab">
+                                    <em class="txt">noun</em>
+                                    <strong class="ttl">examination, quiz</strong>
+                                </a>
+                            </li>
+                                                        <li>
+                                <a href="#" data-complbuckets="3" data-explore="analyze" data-syncount="32" data-thes-id="18298" data-id="1" id="pos-tab-1" class="pos-tab">
+                                    <em class="txt">verb</em>
+                                    <strong class="ttl">examine, quiz</strong>
+                                </a>
+                            </li>
+                                                                        </ul>
+                </div>
+                <span class="layer disabled"></span>
+                <span class="layer-l disabled"></span>
+                <a href="#" class="prev disabled adrefresh-mousedown">prev</a>
+                <a href="#" class="next disabled adrefresh-mousedown">next</a>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </section>
+
+   <a href="http://www.thesaurus.com/"  class="back-button"  id="prev-gutter" data-linkid="jgq255" >    </a>
+
+
+    <a href="http://www.thesaurus.com/browse/analysis"  class="next-button"  id="explore-gutter" data-linkid="huiazc" >        <strong class="text gutter-text ">
+            analysis        </strong>
+            </a>
+</div>
+    </div>
+    <div id="content" class="direct">
+        <div class="main-content"  data-linkid='nn1ov4'>
+    <div class="main-content-holder">
+        
+                <!-- sliders -->
+        <div class="sliders">
+            <div class="slider-frame active box1">
+                <strong class="ttl">Relevance</strong>
+                <div class="tooltip">
+                    <div>
+                        <b>Relevance</b> ranks synonyms and suggests the best matches based on how closely a synonym’s sense matches the sense you selected.
+                    </div>
+                </div>
+                <!-- switcher -->
+                <div class="slider-box sort-slider">
+                    <div class="frame">
+                        <div class="slider-line ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+                            <input type="hidden" class="min-val" value="0">
+                            <input type="hidden" class="max-val" value="1">
+                            <input type="hidden" class="cur-val" value="0">
+                            <input type="hidden" class="step" value="1">
+                            <div class="ui-slider-range ui-widget-header ui-slider-range-min" style="width: 0%;"></div>
+                            <div class="ui-handle-helper-parent">
+                                <div class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <strong class="ttl second">A-Z</strong>
+            </div>
+            <div class="slider-frame box2">
+                <strong class="ttl">Complexity</strong>
+                <div class="tooltip">
+                    <div>
+                        <b>Complexity</b> sorts synonyms based on their difficulty. Adjust it higher to choose from words that are more complex.
+                    </div>
+                </div>
+                <div class="slider-box filter-slider min" data-group="complexity">
+                    <div class="frame">
+                        <div class="slider-line ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+                            <input type="hidden" class="min-val" value="0">
+                            <input type="hidden" class="max-val" value="3">
+                            <input type="hidden" class="cur-val" value="0">
+                            <input type="hidden" class="step" value="1">
+                            <div class="ui-handle-helper-parent">
+                                <div class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="minus disabled">-</div>
+                    <div class="plus">+</div>
+                    <span class="filter-mask" style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; z-index: 10; display: none;"></span>
+                </div>
+            </div>
+            <div class="slider-frame box3">
+                <strong class="ttl">Length</strong>
+                <div class="tooltip">
+                    <div>
+                        <b>Length</b> ranks your synonyms based on character count.
+                    </div>
+                </div>
+                <div class="slider-box filter-slider min" data-group="length">
+                    <div class="frame">
+                        <div class="slider-line ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all">
+                            <input type="hidden" class="min-val" value="0">
+                            <input type="hidden" class="max-val" value="5">
+                            <input type="hidden" class="cur-val" value="0">
+                            <input type="hidden" class="step" value="1">
+                            <div class="ui-handle-helper-parent">
+                                <div class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="minus disabled">-</div>
+                    <div class="plus">+</div>
+                    <span class="filter-mask" style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; z-index: 10; display: none;"></span>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+        <!-- google_ad_section_start(name=maincontent,weight=1) -->
+<div class="synonyms_wrapper">
+    <!-- tabset -->
+    <ul class="tabset">
+        <li id="list-visualization" class="lists active adrefresh-mousedown"><span>lists</span></li>
+        <li id="block-visualization" class="blocks adrefresh-mousedown"><span>blocks</span></li>
+    </ul>
+        <div class="form-block">
+        <!-- words-form -->
+        <div class="words-form">
+            <input type="checkbox" id="common_checkbox" class="jcf-hidden">
+            <label for="common_checkbox" class="">Common</label>
+            <div class="tooltip">
+                <div>
+                    <b>Common</b> words appear frequently in written and spoken language across many genres from radio to academic journals.
+                </div>
+            </div>
+        </div>
+        <div class="words-form">
+            <input type="checkbox" id="informal_checkbox" class="jcf-hidden">
+            <label for="informal_checkbox" class="">Informal</label>
+            <div class="tooltip">
+                <div>
+                    <b>Informal</b> words should be reserved for casual, colloquial communication.
+                </div>
+            </div>
+        </div>
+    </div>
+                                        <div id="synonyms-0" class="synonyms">
+            <div class="heading-row synonyms-heading">
+                <em class="txt">noun</em>
+                <strong class="ttl">examination, quiz</strong>
+            </div>
+            <div class="filters" id="filters-0">
+                <div class="heading-row">
+                    <h2>
+                        Synonyms <span>for test</span>                    </h2>
+                </div>
+                <div class="synonym-description">
+                    <em class="txt">noun</em>
+                    <strong class="ttl">examination, quiz</strong>
+                </div>
+                <div class="relevancy-block">
+                    <div class="relevancy-list">
+                                                                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/search" class="common-word" data-id="1" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">search</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/attempt" class="common-word" data-id="2" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">attempt</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/final" class="common-word" data-id="3" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">final</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/evaluation" class="common-word" data-id="4" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">evaluation</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/analysis" class="common-word" data-id="5" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">analysis</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/standard" class="common-word" data-id="6" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">standard</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/trial" class="common-word" data-id="7" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">trial</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/experiment" class="common-word" data-id="8" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="2" data-length="2"><span class="text">experiment</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/inquiry" class="common-word" data-id="9" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">inquiry</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/investigation" class="common-word" data-id="10" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="3"><span class="text">investigation</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/assessment" class="common-word" data-id="11" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">assessment</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/approval" class="common-word" data-id="12" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">approval</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/inspection" class="common-word" data-id="13" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">inspection</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/check" class="common-word" data-id="14" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">check</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/essay" class="common-word" data-id="15" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="1"><span class="text">essay</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/lick" class="informal-word" data-id="16" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">lick</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/elimination" data-id="17" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="3"><span class="text">elimination</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/go" class="informal-word" data-id="18" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="1"><span class="text">go</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/probation" data-id="19" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">probation</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/questionnaire" class="common-word" data-id="20" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="3"><span class="text">questionnaire</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/shibboleth" data-id="21" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="3" data-length="2"><span class="text">shibboleth</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/inquest" data-id="22" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">inquest</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/corroboration" data-id="23" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="3"><span class="text">corroboration</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/criterion" data-id="24" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">criterion</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/yardstick" data-id="25" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">yardstick</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/confirmation" data-id="26" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="3"><span class="text">confirmation</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/exam" class="common-word" data-id="27" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">exam</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/fling" class="informal-word" data-id="28" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="1"><span class="text">fling</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/scrutiny" data-id="29" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">scrutiny</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/preliminary" class="common-word" data-id="30" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="3"><span class="text">preliminary</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/probing" data-id="31" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="2"><span class="text">probing</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/substantiation" data-id="32" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="3" data-length="3"><span class="text">substantiation</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/catechism" data-id="33" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">catechism</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/ordeal" data-id="34" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">ordeal</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/try" class="common-word" data-id="35" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="1"><span class="text">try</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/tryout" data-id="36" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">tryout</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/oral" class="common-word" data-id="37" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="1"><span class="text">oral</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/touchstone" data-id="38" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="3" data-length="2"><span class="text">touchstone</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/proof" class="common-word" data-id="39" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="1" data-length="1"><span class="text">proof</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/dry%20run" data-id="40" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">dry run</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/trial%20and%20error" data-id="41" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">trial and error</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/trial%20run" data-id="42" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">trial run</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/countdown" data-id="43" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="3" data-length="2"><span class="text">countdown</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/comp" data-id="44" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">comp</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/verification" class="common-word" data-id="45" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="3"><span class="text">verification</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/blue%20book" data-id="46" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">blue book</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/pop%20quiz" data-id="47" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">pop quiz</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                                            </div>
+                </div>
+            </div>
+            <div id="filter-0"></div>
+                        <div class="editorial-content-feed"></div>
+                                    <section class="container-info antonyms" >
+                <div class="heading-row">
+                    <h2>Antonyms <span>for test</span></h2>
+                </div>
+                <div class="list-holder">
+                                                                <ul class="list">
+                                                            <li><a href="http://www.thesaurus.com/browse/conclusion" class="common-word" data-id="47" data-category="{&quot;name&quot;: &quot;relevant--2&quot;, &quot;color&quot;: &quot;#e6e7e8&quot;}" data-complexity="1" data-length="1"><span class="text">conclusion</span></a></li>
+                                                    </ul>
+                                    </div>
+                <div class="citation">
+                    <div>
+                        Roget's 21st Century Thesaurus, Third Edition Copyright © 2013 by the Philip Lief Group.
+                    </div>
+                    <a class="underline" href="http://www.thesaurus.com/cite.html?qh=test&ia=lexrog">Cite This Source</a>
+                </div>
+            </section>
+                                </div>
+            <div id="synonyms-1" class="synonyms">
+            <div class="heading-row synonyms-heading">
+                <em class="txt">verb</em>
+                <strong class="ttl">examine, quiz</strong>
+            </div>
+            <div class="filters" id="filters-1">
+                <div class="heading-row">
+                    <h2>
+                        Synonyms                     </h2>
+                </div>
+                <div class="synonym-description">
+                    <em class="txt">verb</em>
+                    <strong class="ttl">examine, quiz</strong>
+                </div>
+                <div class="relevancy-block">
+                    <div class="relevancy-list">
+                                                                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/assess" class="common-word" data-id="1" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="2" data-length="1"><span class="text">assess</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/prove" class="common-word" data-id="2" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">prove</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/verify" data-id="3" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="2" data-length="1"><span class="text">verify</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/confirm" class="common-word" data-id="4" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="2" data-length="1"><span class="text">confirm</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/question" class="common-word" data-id="5" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">question</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/try" class="common-word" data-id="6" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">try</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/investigate" class="common-word" data-id="7" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="2"><span class="text">investigate</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/demonstrate" class="common-word" data-id="8" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="2" data-length="2"><span class="text">demonstrate</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/analyze" class="common-word" data-id="9" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">analyze</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/check" class="common-word" data-id="10" data-category="{&quot;name&quot;: &quot;relevant-3&quot;, &quot;color&quot;: &quot;#fcbb45&quot;}" data-complexity="1" data-length="1"><span class="text">check</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/inquire" data-id="11" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">inquire</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/substantiate" data-id="12" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="3" data-length="2"><span class="text">substantiate</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/validate" data-id="13" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">validate</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/experiment" class="common-word" data-id="14" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="2"><span class="text">experiment</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/assay" data-id="15" data-category="{&quot;name&quot;: &quot;relevant-2&quot;, &quot;color&quot;: &quot;#fbd48e&quot;}" data-complexity="2" data-length="1"><span class="text">assay</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/look%20into" data-id="16" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">look into</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/try%20on" data-id="17" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="1"><span class="text">try on</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/prove%20out" data-id="18" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">prove out</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/experimentalize" data-id="19" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">experimentalize</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/give%20a%20tryout" data-id="20" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">give a tryout</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/make%20a%20trial%20run" data-id="21" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">make a trial run</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/match%20up" data-id="22" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="1"><span class="text">match up</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/put%20to%20the%20test" data-id="23" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">put to the test</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/run%20idea%20by%20someone" data-id="24" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">run idea by someone</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                         
+                            <ul>
+                                                                    <li><a href="http://www.thesaurus.com/browse/run%20it%20up%20a%20flagpole" data-id="25" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">run it up a flagpole</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/see%20how%20it%20flies" data-id="26" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">see how it flies</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/see%20how%20wind%20blows" data-id="27" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">see how wind blows</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/send%20up%20a%20balloon" data-id="28" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">send up a balloon</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/shake%20down" data-id="29" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="2"><span class="text">shake down</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/stack%20up" data-id="30" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="1"><span class="text">stack up</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/try%20on%20for%20size" data-id="31" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="3"><span class="text">try on for size</span><span class="star inactive">star</span></a></li>
+                                                                    <li><a href="http://www.thesaurus.com/browse/try%20out" data-id="32" data-category="{&quot;name&quot;: &quot;relevant-1&quot;, &quot;color&quot;: &quot;#fce8c4&quot;}" data-complexity="3" data-length="1"><span class="text">try out</span><span class="star inactive">star</span></a></li>
+                                                            </ul>
+                                            </div>
+                </div>
+            </div>
+            <div id="filter-1"></div>
+                        <div class="editorial-content-feed"></div>
+                                    <section class="container-info antonyms" >
+                <div class="heading-row">
+                    <h2>Antonyms </h2>
+                </div>
+                <div class="list-holder">
+                                                                <ul class="list">
+                                                            <li><a href="http://www.thesaurus.com/browse/disprove" data-id="32" data-category="{&quot;name&quot;: &quot;relevant--3&quot;, &quot;color&quot;: &quot;#c7c8ca&quot;}" data-complexity="3" data-length="1"><span class="text">disprove</span></a></li>
+                                                    </ul>
+                                            <ul class="list">
+                                                            <li><a href="http://www.thesaurus.com/browse/invalidate" data-id="33" data-category="{&quot;name&quot;: &quot;relevant--3&quot;, &quot;color&quot;: &quot;#c7c8ca&quot;}" data-complexity="3" data-length="3"><span class="text">invalidate</span></a></li>
+                                                    </ul>
+                                            <ul class="list">
+                                                            <li><a href="http://www.thesaurus.com/browse/discredit" data-id="34" data-category="{&quot;name&quot;: &quot;relevant--3&quot;, &quot;color&quot;: &quot;#c7c8ca&quot;}" data-complexity="1" data-length="2"><span class="text">discredit</span></a></li>
+                                                    </ul>
+                                    </div>
+                <div class="citation">
+                    <div>
+                        Roget's 21st Century Thesaurus, Third Edition Copyright © 2013 by the Philip Lief Group.
+                    </div>
+                    <a class="underline" href="http://www.thesaurus.com/cite.html?qh=test&ia=lexrog">Cite This Source</a>
+                </div>
+            </section>
+                                </div>
+    </div>
+<!-- google_ad_section_end(name=maincontent) -->
+<script type="text/javascript">
+    var synonyms = document.getElementsByClassName('synonyms');
+    for (var i in synonyms) {
+        if ( i > 0) {
+            synonyms[i].style.display = "none";
+        }
+    }
+</script>
+            <div class="survey"  data-imp="4b238x">
+        <a href="http://www.dictionary.com/e/s/odd-jobs/?src=tcom-serp-tab"  class="link"  target="_blank" data-linkid="4b238x" >The weirdest jobs that actually exist</a>    </div>
+                
+                
+            </div>
+    
+</div>
+<div id="synonym_of_synonyms_0" class="box syn_of_syns oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled">More words related to <strong>test</strong></h2>
+        <div  data-linkid='nn1ov4' data-ordinal='1' >
+    <div class="subtitle">
+        <a href="http://www.thesaurus.com/browse/analysis">analysis<a/>    </div>
+    <div class="def">noun. examination and determination</div>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/assay" class="syn_of_syns">assay</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/breakdown" class="syn_of_syns">breakdown</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/dissection" class="syn_of_syns">dissection</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/dissolution" class="syn_of_syns">dissolution</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/division" class="syn_of_syns">division</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/inquiry" class="syn_of_syns">inquiry</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/investigation" class="syn_of_syns">investigation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/partition" class="syn_of_syns">partition</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/reasoning" class="syn_of_syns">reasoning</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/resolution" class="syn_of_syns">resolution</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/scrutiny" class="syn_of_syns">scrutiny</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/search" class="syn_of_syns">search</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/separation" class="syn_of_syns">separation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/study" class="syn_of_syns">study</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/subdivision" class="syn_of_syns">subdivision</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/test" class="syn_of_syns">test</a></li>
+            </ul>
+        <div class="link">
+    </div>
+</div>
+    </div>
+</div>
+<div id="synonym_of_synonyms_1" class="box syn_of_syns oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled"></h2>
+        <div  data-linkid='nn1ov4' data-ordinal='1' >
+    <div class="subtitle">
+        <a href="http://www.thesaurus.com/browse/analyze">analyze<a/>    </div>
+    <div class="def">verb. examine and determine</div>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/assay" class="syn_of_syns">assay</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/beat%20a%20dead%20horse" class="syn_of_syns">beat a dead horse</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/chew%20over" class="syn_of_syns">chew over</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/confab" class="syn_of_syns">confab</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/consider" class="syn_of_syns">consider</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/estimate" class="syn_of_syns">estimate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/evaluate" class="syn_of_syns">evaluate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/figure" class="syn_of_syns">figure</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/figure%20out" class="syn_of_syns">figure out</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/get%20down%20to%20brass%20tacks" class="syn_of_syns">get down to brass tacks</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/hash" class="syn_of_syns">hash</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/inspect" class="syn_of_syns">inspect</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/interpret" class="syn_of_syns">interpret</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/investigate" class="syn_of_syns">investigate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/judge" class="syn_of_syns">judge</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/kick%20around" class="syn_of_syns">kick around</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/rehash" class="syn_of_syns">rehash</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/resolve" class="syn_of_syns">resolve</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/scrutinize" class="syn_of_syns">scrutinize</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/sort%20out" class="syn_of_syns">sort out</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/spell%20out" class="syn_of_syns">spell out</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/study" class="syn_of_syns">study</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/talk%20game" class="syn_of_syns">talk game</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/test" class="syn_of_syns">test</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/think%20through" class="syn_of_syns">think through</a></li>
+            </ul>
+        <div class="link">
+    </div>
+</div>
+    </div>
+</div>
+<div id="synonym_of_synonyms_2" class="box syn_of_syns oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled"></h2>
+        <div  data-linkid='nn1ov4' data-ordinal='1' >
+    <div class="subtitle">
+        <a href="http://www.thesaurus.com/browse/assay">assay<a/>    </div>
+    <div class="def">noun. analysis</div>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/appraisal" class="syn_of_syns">appraisal</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/assessment" class="syn_of_syns">assessment</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/estimation" class="syn_of_syns">estimation</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/evaluation" class="syn_of_syns">evaluation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/examination" class="syn_of_syns">examination</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/inspection" class="syn_of_syns">inspection</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/investigation" class="syn_of_syns">investigation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/measurement" class="syn_of_syns">measurement</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/rating" class="syn_of_syns">rating</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/survey" class="syn_of_syns">survey</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/test" class="syn_of_syns">test</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/trial" class="syn_of_syns">trial</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/valuation" class="syn_of_syns">valuation</a></li>
+            </ul>
+        <div class="link">
+    </div>
+</div>
+    </div>
+</div>
+<div id="synonym_of_synonyms_3" class="box syn_of_syns oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled"></h2>
+        <div  data-linkid='nn1ov4' data-ordinal='1' >
+    <div class="subtitle">
+        <a href="http://www.thesaurus.com/browse/assay">assay<a/>    </div>
+    <div class="def">verb. analyze</div>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/appraise" class="syn_of_syns">appraise</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/apprise" class="syn_of_syns">apprise</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/assess" class="syn_of_syns">assess</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/check" class="syn_of_syns">check</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/check%20out" class="syn_of_syns">check out</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/estimate" class="syn_of_syns">estimate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/evaluate" class="syn_of_syns">evaluate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/examine" class="syn_of_syns">examine</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/eyeball" class="syn_of_syns">eyeball</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/inspect" class="syn_of_syns">inspect</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/investigate" class="syn_of_syns">investigate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/measure" class="syn_of_syns">measure</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/peg" class="syn_of_syns">peg</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/prove" class="syn_of_syns">prove</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/rate" class="syn_of_syns">rate</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/read" class="syn_of_syns">read</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/see" class="syn_of_syns">see</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/size" class="syn_of_syns">size</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/size%20up" class="syn_of_syns">size up</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/survey" class="syn_of_syns">survey</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/test" class="syn_of_syns">test</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/try" class="syn_of_syns">try</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/valuate" class="syn_of_syns">valuate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/value" class="syn_of_syns">value</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/weigh" class="syn_of_syns">weigh</a></li>
+            </ul>
+        <div class="link">
+    </div>
+</div>
+    </div>
+</div>
+<div id="synonym_of_synonyms_4" class="box syn_of_syns oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled"></h2>
+        <div  data-linkid='nn1ov4' data-ordinal='1' >
+    <div class="subtitle">
+        <a href="http://www.thesaurus.com/browse/challenge">challenge<a/>    </div>
+    <div class="def">noun. dispute, question</div>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/claiming" class="syn_of_syns">claiming</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/confrontation" class="syn_of_syns">confrontation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/dare" class="syn_of_syns">dare</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/defiance" class="syn_of_syns">defiance</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/demanding" class="syn_of_syns">demanding</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/demur" class="syn_of_syns">demur</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/interrogation" class="syn_of_syns">interrogation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/objection" class="syn_of_syns">objection</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/protest" class="syn_of_syns">protest</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/provocation" class="syn_of_syns">provocation</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/remonstrance" class="syn_of_syns">remonstrance</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/summons%20to%20contest" class="syn_of_syns">summons to contest</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/test" class="syn_of_syns">test</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/threat" class="syn_of_syns">threat</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/trial" class="syn_of_syns">trial</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/ultimatum" class="syn_of_syns">ultimatum</a></li>
+            </ul>
+        <div class="link">
+    </div>
+</div>
+    </div>
+</div>
+<div id="synonym_of_synonyms_5" class="box syn_of_syns oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled"></h2>
+        <div  data-linkid='nn1ov4' data-ordinal='1' >
+    <div class="subtitle">
+        <a href="http://www.thesaurus.com/browse/challenge">challenge<a/>    </div>
+    <div class="def">verb. dispute, question</div>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/accost" class="syn_of_syns">accost</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/arouse" class="syn_of_syns">arouse</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/ask%20for" class="syn_of_syns">ask for</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/assert" class="syn_of_syns">assert</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/beard" class="syn_of_syns">beard</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/brave" class="syn_of_syns">brave</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/call%20for" class="syn_of_syns">call for</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/call%20out" class="syn_of_syns">call out</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/claim" class="syn_of_syns">claim</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/confront" class="syn_of_syns">confront</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/cross" class="syn_of_syns">cross</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/dare" class="syn_of_syns">dare</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/defy" class="syn_of_syns">defy</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/demand" class="syn_of_syns">demand</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/denounce" class="syn_of_syns">denounce</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/exact" class="syn_of_syns">exact</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/face%20down" class="syn_of_syns">face down</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/face%20off" class="syn_of_syns">face off</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/face%20the%20music" class="syn_of_syns">face the music</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/fly%20in%20the%20face%20of" class="syn_of_syns">fly in the face of</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/hang%20in" class="syn_of_syns">hang in</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/impeach" class="syn_of_syns">impeach</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/impose" class="syn_of_syns">impose</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/impugn" class="syn_of_syns">impugn</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/inquire" class="syn_of_syns">inquire</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/insist%20upon" class="syn_of_syns">insist upon</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/investigate" class="syn_of_syns">investigate</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/invite%20competition" class="syn_of_syns">invite competition</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/make%20a%20point%20of" class="syn_of_syns">make a point of</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/make%20a%20stand" class="syn_of_syns">make a stand</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/object%20to" class="syn_of_syns">object to</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/provoke" class="syn_of_syns">provoke</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/query" class="syn_of_syns">query</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/reclaim" class="syn_of_syns">reclaim</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/require" class="syn_of_syns">require</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/search%20out" class="syn_of_syns">search out</a></li>
+            </ul>
+        <ul>
+                    <li><a href="http://www.thesaurus.com/browse/stand%20up%20to" class="syn_of_syns">stand up to</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/stick%20it%20out" class="syn_of_syns">stick it out</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/stimulate" class="syn_of_syns">stimulate</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/summon" class="syn_of_syns">summon</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/tax" class="syn_of_syns">tax</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/test" class="syn_of_syns">test</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/throw%20down%20the%20gauntlet" class="syn_of_syns">throw down the gauntlet</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/try" class="syn_of_syns">try</a></li>
+                    <li><a href="http://www.thesaurus.com/browse/vindicate" class="syn_of_syns">vindicate</a></li>
+            </ul>
+        <div class="link">
+    </div>
+</div>
+    </div>
+</div>
+    <div class="citation">
+        <div>
+            Roget's 21st Century Thesaurus, Third Edition Copyright © 2013 by the Philip Lief Group.
+        </div>
+        <a href="http://www.thesaurus.com/cite.html?qh=challenge&ia=lexrog"  class="underline" data-linkid="xjkd2s" >Cite This Source</a>
+    </div>
+
+
+    <div id="paginator"  data-linkid='2b1bcp'>
+                                                                <div class="active">
+                        <a href="http://www.thesaurus.com/browse/test/1">
+                            1                        </a>
+                    </div>
+                                                                                    <div >
+                        <a href="http://www.thesaurus.com/browse/test/2">
+                            2                        </a>
+                    </div>
+                                                                                    <div >
+                        <a href="http://www.thesaurus.com/browse/test/3">
+                            3                        </a>
+                    </div>
+                                                                                    ...                                                                                    <div class="last">
+                        <a href="http://www.thesaurus.com/browse/test/8">
+                            8                        </a>
+                    </div>
+                                                        <span>
+                <a href="http://www.thesaurus.com/browse/test/2">
+                    NEXT
+                </a>
+            </span>
+            </div>
+    <div class="bottom-border">&nbsp</div>
+
+<div class="ad">
+    <div class="banner">
+        <div id="thesaurus_serp_btf_2">
+    <script type="text/javascript">
+        if (typeof UserController !== "undefined" && !UserController.shouldDisplayAds()) {
+            document.getElementById("thesaurus_serp_btf_2").parentNode.removeChild(document.getElementById(""));
+        } else {
+            adStatus.displayedSpots.push("thesaurus_serp_btf_2");
+            googletag.cmd.push(function () {
+                googletag.display("thesaurus_serp_btf_2");
+            });
+        }
+    </script>
+</div>    </div>
+</div>
+
+    </div>
+    <div id="right-sidebar">
+        <!-- sidebar -->
+<aside id="sidebar" class="direct">
+    
+    <div class="content-block">
+        <!-- ad -->
+        <div class="ad">
+            <div class="banner">
+                <div id="thesaurus_serp_atf_300x250">
+    <script type="text/javascript">
+        if (typeof UserController !== "undefined" && !UserController.shouldDisplayAds()) {
+            document.getElementById("thesaurus_serp_atf_300x250").parentNode.removeChild(document.getElementById(""));
+        } else {
+            adStatus.displayedSpots.push("thesaurus_serp_atf_300x250");
+            googletag.cmd.push(function () {
+                googletag.display("thesaurus_serp_atf_300x250");
+            });
+        }
+    </script>
+</div>            </div>
+        </div>
+                <script type="text/javascript">
+            if (UserController.shouldDisplayAds()) {
+                document.write('');
+            }
+        </script>
+
+        
+        <div class="empty-box" data-cts='{"linkId":"nn1ov4","infix":"","domain":"dictionary.com","clkpage":"the","clkmod":"1clk","clksite":"thes","clkld":0}' data-href='http://www.dictionary.com/browse/'>
+        <div id="word-origin" class="box  oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled">Word Origin & History</h2>
+        <div>
+<p>
+test late 14c., "small vessel used in assaying precious metals," from O.Fr. test, from L. testum "earthen pot," related to testa "piece of burned clay, earthen pot, shell" (cf. L. testudo "tortoise") and texere "to weave" (cf. Lith. tistas "vessel made of willow twigs;" see texture). Sense of "trial or examination to determine the correctness of something" is recorded from 1590s. The verb in this sense is from 1748. The connecting notion is "ascertaining the quality of a metal by melting it in a pot." Test-tube is from 1846; test-tube baby is recorded from 1935. Test Act was the name given to various  <span class="hide" style="display: inline">...</span><span class="hide">laws in English history meant to exclude Catholics and Nonconformists from office, especially that of 1673, repealed 1828. Test drive (v.) is first recorded 1954. </span></p>
+</div>
+<span class="link-row">
+    <a class="more" href="#" onclick="return false">
+        EXPAND
+    </a>
+</span>
+    </div>
+</div>
+       </div>
+        
+        <div class="ad">
+            <div class="banner">
+                <div id="thesaurus_serp_btf_300x252">
+    <script type="text/javascript">
+        if (typeof UserController !== "undefined" && !UserController.shouldDisplayAds()) {
+            document.getElementById("thesaurus_serp_btf_300x252").parentNode.removeChild(document.getElementById(""));
+        } else {
+            adStatus.displayedSpots.push("thesaurus_serp_btf_300x252");
+            googletag.cmd.push(function () {
+                googletag.display("thesaurus_serp_btf_300x252");
+            });
+        }
+    </script>
+</div>            </div>  
+        </div>
+        
+        <div class="empty-box" data-cts='{"linkId":"ixxth0","infix":"","domain":"dictionary.com","clkpage":"the","clkmod":"1clkesp","clksite":"thes","clkld":0}' data-href='http://www.dictionary.com/browse/'>
+        <div id="example-sentences" class="box  oneClick-area">
+    <div class="box-content-holder">
+        <h2 class="oneClick-disabled">Example Sentences <span>for test</span></h2>
+        <div>
+    <p class="">
+        If this be the <b>test</b>, I am willing to be tried with Hipparete at the court of the Muses.    </p>
+    <p class="">
+        You have never been put to a <b>test</b> till now, that deserved to be called a <b>test</b>.    </p>
+    <p class="">
+        It is a <b>test</b> of our courage—of our resolve—of our wisdom—our essential democracy.    </p>
+    <p class="">
+        They will <b>test</b> our courage, our devotion to duty, and our concept of liberty.    </p>
+    <p class="hide">
+        Some have unwisely chosen to <b>test</b> America's resolve, and have found it firm.    </p>
+    <p class="hide">
+        A <b>test</b> that can be applied by the housewife is illustrated in Fig. 4.    </p>
+    <p class="hide">
+        This is the <b>test</b> that is made for taffy and other hard candies.    </p>
+    <p class="hide">
+        It is time now, I think, to <b>test</b> my theory by considering the converse of it.    </p>
+    <p class="hide">
+        The scriptural truths are to be judged by no other <b>test</b> than that of their worth for life.    </p>
+    <p class="hide">
+        And always they brought their theology to the <b>test</b> of actual life.    </p>
+</div>
+<span class="link-row">
+    <a class="more" href="#" onclick="return false">
+        EXPAND
+    </a>
+</span>
+    </div>
+</div>
+        </div>	
+    </div>
+</aside>
+    </div>
+    <div class="clear"></div>
+</div>
+<div id="audioPlayerWrapper">
+    <p id="audioplayer"></p>
+</div>
+<div>
+    <div id="gsl_init"
+     data-type='csa'
+     data-bpc='1'
+     data-afsClient='aj-lexico-thes'
+     data-afsChannel='channel-01+LD1'
+     data-afcClient='ca-aj-lexico-thes'
+     data-afcChannel='channel-01+LD1'
+     data-numOfAds='0'
+     data-adtest='off'
+     data-afsQuery='test'
+     data-afcQuery='test'
+     data-impression='{"basePath":"http:\/\/track.thesaurus.com\/track\/impression2","attributes":{"site":"thes","pageName":"the","ldid":0}}'
+     	 data-customPage='{"width":"100%"}'
+     data-customSpot='{"sitelinks":"true"}'
+        >
+</div>
+<div id="afcadcontainer"></div></div>
+<div id='bkpix'></div>
+<div id='csPixel'></div>
+<div id='neiPixel'></div><footer class="footer-thin">
+    <div class="footer-container"  data-linkid='gy27eg'>
+        <div>
+            <ul class="footer-navbar">
+                <li class="footer-navbar-list">
+                    <a href="http://content.dictionary.com/">About</a>
+                </li>
+                <li class="footer-navbar-list">
+                    <a href="http://www.dictionary.com/terms">Terms & Privacy</a>
+                </li>
+            </ul>
+            <div class="footer-copyright">
+                &copy;&nbsp;2017 Dictionary.com, LLC.
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    /*
+     Below immediately function provide support for browsers, which do not support modern standards (https://dom.spec.whatwg.org/)
+     partially taken from: plainjs.com
+    */
+    (function (e) {
+        'use strict';
+        e.matches = e.matches ||
+            e.matchesSelector ||
+            e.webkitMatchesSelector ||
+            e.msMatchesSelector ||
+            function (selector) {
+                var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
+                while (nodes[++i] && nodes[i] != node);
+                return !!nodes[i];
+            };
+        e.closest = e.closest || function (css) {
+                var node = this;
+                while (node) {
+                    if (node.matches(css)) return node;
+                    else node = node.parentElement;
+                }
+                return null;
+            };
+        e.hasClass = e.hasClass || function (className) {
+                var node = this;
+                return node.classList ? node.classList.contains(className) : new RegExp('\\b' + className + '\\b').test(node.className);
+            };
+        e.addClass = e.addClass || function (className) {
+                var node = this;
+                if (node.classList) node.classList.add(className);
+                else if (!node.hasClass(node, className)) node.className += ' ' + className;
+            };
+        e.removeClass = e.removeClass || function(className) {
+                var node = this;
+                if (node.classList) node.classList.remove(className);
+                else node.className = node.className.replace(new RegExp('\\b' + className + '\\b', 'g'), '');
+            };
+        e.on = e.on || function (event, selector, callback, context) {
+                var el = context || document;
+                el.addEventListener(event, function (e) {
+                    var found, el = e.target || e.srcElement;
+                    while (el && el.matches && el !== context && !(found = el.matches(selector))) el = el.parentElement;
+                    if (found) callback.call(this, el, e);
+                });
+            };
+    }(Element.prototype));
+</script><script type="text/javascript" src="http://app.dictionary.com/js/advertisement.js"></script>
+<script>
+    if (typeof window.canRunAds === 'undefined') {
+        var img = new Image(),
+        url = 'http://track.thesaurus.com/main.gif?ev=a&ms=%40%40MSEG%40%40&rf=%40%40REFERRER%40%40&cb=%40%40CACHEBUSTER%40%40&pn=the&st=thes&ab=&dc=desktop';
+
+        url = url.replace('%40%40REFERRER%40%40', encodeURIComponent(document.referrer))
+            .replace('%40%40CACHEBUSTER%40%40', Math.floor((Math.random() * 899999999) + 100000000))
+            .replace('%40%40MSEG%40%40', (cookiesManager.getCookieValue('mseg') || ''));
+        img.src = url;
+    }
+</script>
+<!-- Begin Quantcast Tag, part 2 -->
+<script type="text/javascript">
+if (typeof UserController === "undefined" || !UserController.isUnder13()) {
+    _qevents.push({qacct: "p-51zXP5Cc9sxvQ"});
+}
+</script>
+<noscript>
+<div style="display: none;"><img src="//pixel.quantserve.com/pixel/p-51zXP5Cc9sxvQ.gif" height="1" width="1" alt="Quantcast"/></div>
+</noscript>
+<!-- End Quantcast Tag, part 2 --><script>
+    /*global $, pageName, window */
+
+    var BCT = (function () {
+        'use strict';
+
+        var webTrackURL = 'http://track.thesaurus.com/main.gif?ev=c&cl=%40%40LINKIDS%40%40&ci=%40%40ITEM%40%40&co=%40%40ORDINAL%40%40&ms=%40%40MSEG%40%40&ds=%40%40DESTINATION%40%40&qr=%25%25QUERY%25%25&rf=%40%40REFERRER%40%40&cb=%40%40CACHEBUSTER%40%40&pn=%40%40PAGENAME%40%40&st=thes&ab=&dc=desktop',
+            query, originalQuery;
+
+                    originalQuery = typeof DARCI.OQR !== 'undefined' ? DARCI.OQR.getValue() : null;
+            query =  originalQuery !== null ? originalQuery : "test";
+
+            webTrackURL = webTrackURL.replace('%25%25QUERY%25%25', query);
+        
+        /**
+         * Returns data, which will be logged.
+         *
+         * NOTE:
+         * Possible, that empty array will be returned.
+         */
+        function getData(target) {
+            var ctsData,
+                closestLinkIDElement,
+                data = {};
+
+            ctsData = JSON.parse(target.getAttribute('data-cts'));
+            if (ctsData !== null) {
+                data.linkId = ctsData.linkId;
+                data.item = "";
+                data.ordinal = ctsData.ordinal;
+            } else {
+                closestLinkIDElement = target.closest('[data-linkid]');
+                if (null !== closestLinkIDElement && null === target.closest('[data-type]')) {
+                    data.linkId = closestLinkIDElement.getAttribute('data-linkid');
+                    data.item = getItem(target);
+                    data.ordinal = getOrdinal(target, closestLinkIDElement);
+                }
+            }
+            return data;
+        }
+
+        function getItem(target) {
+            var closestWithItem = target.closest('[data-item]'),
+                item = '';
+
+            if (null !== closestWithItem) {
+                item = target.textContent.trim();
+            }
+
+            return item;
+        }
+
+        function getOrdinal(target, dataItem) {
+            var closestWithOrdinal,
+                value = '';
+
+            if (dataItem !== target) { // if element with linkid is not the anchor itself we are going deeper
+                closestWithOrdinal = target.closest('[data-ordinal]');
+                if (null !== closestWithOrdinal) {
+                    var links = closestWithOrdinal.querySelectorAll("a"),
+                        len = links.length;
+
+                    for (var i = 0; i < len; i++) {
+                        if (target === links[i]) {
+                            value = i + 1;
+                        }
+                    }
+                }
+            }
+            return value;
+        }
+
+        /**
+         * Returns data, which are generated always in the same way
+         */
+        function getCommonData(destination) {
+            var data = {};
+            data.cacheBuster = Math.floor((Math.random() * 899999999) + 100000000);
+            data.pageName = pageName;
+            data.mseg = getMsegValue();
+            data.destination = encodeURIComponent(destination);
+            return data;
+        }
+
+        /**
+         * Redirects user to destination
+         */
+        function redirectToDest(location) {
+            window.location = location;
+        }
+
+        /**
+         * Returns value of cookie based on name
+         */
+        function getCookieByName(name) {
+            var value = null,
+                cookies = document.cookie,
+                searchedCookie = cookies.indexOf(" " + name + "=");
+
+            // it's worth to check, if cookie is not first cookie
+            if (searchedCookie === -1) {
+                var checkFirstCookie = cookies.indexOf(name + "=");
+                searchedCookie = checkFirstCookie === 0 ? 0 : -1;
+            }
+
+            if (searchedCookie > -1) {
+                var startPositionOfValue = cookies.indexOf("=", searchedCookie) + 1,
+                    endPositionOfValue = cookies.indexOf(";", searchedCookie);
+
+                if (endPositionOfValue === -1) {
+                    endPositionOfValue = searchedCookie.length;
+                }
+
+                value = cookies.substring(startPositionOfValue,endPositionOfValue);
+            }
+
+            return value;
+        }
+
+        /**
+         * Returns value of mseg cookie
+         */
+        function getMsegValue() {
+            var msegVal;
+            if (typeof cookiesManager !== "undefined") {
+                msegVal = cookiesManager.getCookieValue("mseg");
+            } else {
+                msegVal = getCookieByName("mseg");
+            }
+
+            return msegVal || "";
+        }
+
+        /**
+         * Renders WebTrack URL
+         */
+        function renderWebTrackURL(data, destination) {
+            var commonData = getCommonData(destination);
+            return webTrackURL.replace('%40%40REFERRER%40%40', encodeURIComponent(document.referrer))
+                .replace('%40%40LINKIDS%40%40', data.linkId || "")
+                .replace('%40%40ITEM%40%40', encodeURIComponent(data.item) || "")
+                .replace('%40%40ORDINAL%40%40', data.ordinal || "")
+                .replace('%40%40CACHEBUSTER%40%40', commonData.cacheBuster || "")
+                .replace('%40%40PAGENAME%40%40', commonData.pageName || "")
+                .replace('%40%40MSEG%40%40', commonData.mseg || "")
+                .replace('%40%40DESTINATION%40%40', commonData.destination || "");
+        }
+
+        function logAndRedirect(data, destination) {
+            var logURL = renderWebTrackURL(data, destination),
+                image = new Image(),
+                timeout;
+
+            timeout = setTimeout(
+                function(){
+                    redirectToDest(destination);
+                },
+                2000
+            );
+
+            image.onload = image.onerror = function () {
+                clearTimeout(timeout);
+                redirectToDest(destination);
+            };
+
+            image.src = logURL;
+
+            return false;
+        }
+
+        /**
+         * Registers click event handler to body so it receives every click on anchor.
+         */
+        function attachHandler() {
+            var bodyTag = document.getElementsByTagName('body')[0];
+
+            bodyTag.on("click", 'a', function (elem, event) {
+                var target = event.target,
+                    enabled = target.closest('.cts-enabled'),
+                    disabled = target.closest('.cts-disabled'),
+                    destination = elem.getAttribute('href'),
+                    dataToLog;
+
+                if (typeof destination === "undefined") {
+                    return true;
+                }
+
+                if (target.hasClass('cts-clicked')) {
+                    return false;
+                }
+
+                //ACE-1060
+                if (disabled !== null && (enabled === null || disabled.childNodes.length < enabled.childNodes.length)) { return true }
+
+                dataToLog = getData(target);
+
+                // if object has no id it means that link shouldn't be tracked - follow the link
+                if (typeof dataToLog.linkId === "undefined") {
+                    return true;
+                }
+                event.preventDefault();
+
+                // mark this link as already clicked
+                target.addClass('cts-clicked');
+
+                return logAndRedirect(dataToLog, destination);
+            });
+        }
+
+        return {
+            attachHandler: attachHandler,
+            /**
+             * ::redirect() method is method used by oneClick module
+             */
+            redirect: function (ctsData, destinationHref, item) {
+                var data = {};
+                data.linkId = ctsData.linkId || ctsData.linkid;
+                data.item = item;
+                data.ordinal = '';
+                return logAndRedirect(data, destinationHref);
+            }
+        };
+    }());
+
+    /** Do the initial attachment to <body> links */
+    BCT.attachHandler();
+
+</script><script type="text/javascript" src="http://static.sfdict.com/app/js/require-37278.js"></script>
+<script type="text/javascript">
+    requirejs.config({
+            waitSeconds: 60,
+            baseUrl: "http://static.sfdict.com/thescloud/js",
+            paths: {"appcore":"http:\/\/static.sfdict.com\/app\/js","options":"http:\/\/static.sfdict.com\/app\/js\/options-b826f","jquery-ui":"http:\/\/static.sfdict.com\/app\/js\/jquery-ui-1.11.4.min-33a75","twitter":"https:\/\/platform.twitter.com\/widgets","facebook":"http:\/\/connect.facebook.net\/en_US\/all","google-plus":"https:\/\/apis.google.com\/js\/platform","instagram":"https:\/\/x.instagramfollowbutton.com\/follow","jquery":"http:\/\/static.sfdict.com\/app\/js\/jquery-1.11.3.min-4069b","serp":"serp-0121a"},
+            shim: {"twitter":{"exports":"twttr"},"facebook":{"exports":"FB"},"google-plus":{"exports":"googleplus"},"instagram":[]}        });
+        define("runtime-options", function() {
+        return {"localURL":"http:\/\/www.thesaurus.com\/","serpUrl":"http:\/\/www.thesaurus.com\/browse\/","logginRedirect":"http:\/\/app.dictionary.com\/login\/?logindest=","siteName":"thes","pageName":"the","pageType":"direct","adRefresh":{"initDelay":7,"subsDelay":20,"limit":"1"},"mobileCss":"http:\/\/static.sfdict.com\/thescloud\/css\/mobile-3a0a1.css","pageBorderWidth":1280,"POSElementNb":2,"iPadStylePath":"http:\/\/static.sfdict.com\/thescloud\/css\/ipad-7f03b.css","breadCrumbsLimit":30,"searchTerm":"test","clientPlatform":"Desktop","similarityBuckets":3,"lengthBuckets":3,"defaultView":"list","defaultSorting":0,"defaultFontSize":100,"clickTrackMore":"http:\/\/track.thesaurus.com\/track\/clickClient?site=thes&pageName=&ldid=0&module=1clk&linkIds=nn1ov4","gspcDomain":".thesaurus.com","CTSParams":{"infix":"","clkpage":"the","clksite":"thes","clkld":0},"webTrack":{"clickInner":"http:\/\/track.thesaurus.com\/main.gif?ev=n&tg=%40%40TARGET%40%40&ar=%40%40ADREFRESH%40%40&ms=%40%40MSEG%40%40&rf=%40%40REFERRER%40%40&cb=%40%40CACHEBUSTER%40%40&pn=%40%40PAGENAME%40%40&st=thes&ab=&dc=desktop","impressions":"http:\/\/track.thesaurus.com\/main.gif?ev=i&lk=%40%40IMPRESSIONLINKIDS%40%40&ms=%40%40MSEG%40%40&rf=%40%40REFERRER%40%40&cb=%40%40CACHEBUSTER%40%40&pn=%40%40PAGENAME%40%40&st=thes&ab=&dc=desktop","pageview":"http:\/\/track.thesaurus.com\/main.gif?ev=p&ct=%40%40CONTENTTITLE%40%40&ms=%40%40MSEG%40%40&rf=%40%40REFERRER%40%40&cb=%40%40CACHEBUSTER%40%40&pn=%40%40PAGENAME%40%40&st=thes&ab=&dc=desktop","click":"http:\/\/track.thesaurus.com\/main.gif?ev=c&cl=%40%40LINKIDS%40%40&ci=%40%40ITEM%40%40&co=%40%40ORDINAL%40%40&ms=%40%40MSEG%40%40&ds=%40%40DESTINATION%40%40&qr=%25%25QUERY%25%25&rf=%40%40REFERRER%40%40&cb=%40%40CACHEBUSTER%40%40&pn=%40%40PAGENAME%40%40&st=thes&ab=&dc=desktop"},"trackFavorite":"{\"basePath\":\"http:\\\/\\\/track.thesaurus.com\\\/track\\\/favorite\",\"attributes\":{\"site\":\"thes\",\"pageName\":\"the\",\"ldid\":0}}","ctsDataConfuse":"{\"linkId\":\"1vq92f\",\"infix\":\"\",\"domain\":\"dictionary.com\",\"clkpage\":\"the\",\"clkmod\":\"confuse\",\"clksite\":\"thes\",\"clkld\":0}","subscriptionURL":"http:\/\/app.thesaurus.com\/api\/ajaxmailer\/subscription?pageName=the&siteName=thes&ld=0&mseg=91&placement=center"};
+    });
+    require(["serp"])
+</script>
+<script>
+    var ms = (typeof ms === 'undefined') ? cookiesManager.getCookieValue('mseg') || "" : ms;
+    new Image().src = "http://track.thesaurus.com/main.gif?ev=i&lk=huiazc%2C4b238x&pn=the&st=thes&ab=&dc=desktop" + "&rf=" + encodeURIComponent(document.referrer) + "&ms=" + ms + "&cb=" + Math.floor((Math.random() * 899999999) + 100000000);
+</script>
+<script>
+    var jsCookie = {
+        get: function (cName) {
+            return(document.cookie.match('(^|; )' + cName + '=([^;]*)') || 0)[2];
+        },
+        set: function (cName, cValue, ttlMinutes) {
+            var timeCookie = new Date();
+            timeCookie.setMinutes(timeCookie.getMinutes() + ttlMinutes);
+            document.cookie = cName + "=" + escape(cValue) + ((ttlMinutes) ? "; expires=" + timeCookie.toUTCString() : "") + '; domain=' + location.host.match(/[^\.]*\.[^.]*$/)[0] + "; path=/";
+        }
+    };
+
+    function ClickTalePreRecordingHook() {
+        ClickTaleFetchFromWithCookies.setFromCookie('mseg');
+        ClickTaleFetchFromWithCookies.setFromCookie('ab');
+        window.ClickTaleFetchFrom = ClickTaleFetchFromWithCookies.constructFetchFromUrl();
+    }
+
+    (function () {
+        var ctCookie = jsCookie.get('ct');
+        if (!ctCookie) {
+            var sampledPercentage = Math.random() * 100;
+            ctCookie = (sampledPercentage <= 1) ? 'i' : 'o';
+            jsCookie.set('ct', ctCookie, 30);
+        }
+
+        if (typeof UserController !== 'undefined' && UserController.isPremium()) {
+            return;
+        }
+
+        if (ctCookie === 'i') {
+            document.write(unescape("%3Cscript%20src='" + (document.location.protocol == 'https:'
+                ? "https://cdnssl.clicktale.net/www03/ptc/25652b19-8a29-4721-a18e-80d0aa23c314.js"
+                : "http://cdn.clicktale.net/www03/ptc/25652b19-8a29-4721-a18e-80d0aa23c314.js") + "'%20type='text/javascript'%3E%3C/script%3E"));
+        }
+    })();
+</script>
+    </body>
+    </html>

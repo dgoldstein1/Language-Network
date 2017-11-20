@@ -1,0 +1,708 @@
+
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]--><head>
+<script>
+var PREBID_TIMEOUT = 1000;
+var MAX_RETRIES = 20;
+var EXCHANGE_RATE = 3.6;
+var pbjs = pbjs || {};
+pbjs.que = pbjs.que || [];
+
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+
+function detectWidth() {var w = window,d = document, e = d.documentElement, x = screen.width || e.offsetWidth || e.clientWidth;return x;}
+var screenSizeMobile = 768;
+function initHBS() {
+  if (pbjs.initAdserverSet) return;
+  loadScript('//www.googletagservices.com/tag/js/gpt.js');
+  pbjs.initAdserverSet = true;
+}
+setTimeout(initHBS, PREBID_TIMEOUT);
+
+if (detectWidth() < screenSizeMobile) {
+      googletag.cmd.push(function () {
+         googletag.pubads().setTargeting("device", "mobile");
+      });
+    loadScript('http://www.synonyms.net/adunits/prebid-mobile.js');
+} else {
+      googletag.cmd.push(function () {
+         googletag.pubads().setTargeting("device", "desktop");
+      });
+    loadScript('http://www.synonyms.net/adunits/prebid-desktop.js');
+}
+
+function loadScript(scriptSrc) {
+  var script = document.createElement('script');
+  script.async=true;
+  script.type = 'text/javascript';
+  script.src = scriptSrc;
+  var node = document.getElementsByTagName('script')[0];
+  node.parentNode.insertBefore(script, node);
+}
+
+pbjs.que.push(function() {
+  pbjs.bidderSettings = {
+    standard: {
+      adserverTargeting: [{
+        key: "hb_bidder",
+        val: function(bidResponse) {
+         return bidResponse.bidderCode;
+       }
+      }, {
+        key: "hb_adid",
+        val: function(bidResponse) {
+         return bidResponse.adId;
+       }
+      }, {
+        key: "hb_pb",
+        val: function(bidResponse) {
+         if(bidResponse.cpm >= 80) return '80.00';
+         return (Math.floor(bidResponse.cpm * 4) / 4).toFixed(2);
+       }
+      }, {
+         key: 'hb_size',
+         val: function (bidResponse) {
+            return bidResponse.size;
+         }
+      }]
+    },
+    sekindoA:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE * .75;
+      }
+    },
+    aol:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    },
+    sovrn:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    },
+    sekindoUM:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    },
+    pulsepoint:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    },
+    districtmDMX:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE  * .85;
+      }
+    },
+    rhythmone:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    },
+    rubicon:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE * .75;
+      }
+    },
+    brealtime:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE * .85;
+      }
+    },
+    indexExchange:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    },
+    appnexus:{
+      bidCpmAdjustment: function (bidCpm) {
+        return bidCpm * EXCHANGE_RATE;
+      }
+    }
+  };
+});
+</script>
+
+<script>
+var mapSizeMRU = [[300, 250], [300, 600]];
+if(detectWidth() < screenSizeMobile) mapSizeMRU = [[300, 250]];
+
+  googletag.cmd.push(function() {
+    googletag.defineSlot('/52304935/Synonyms_IA_300x250_A', [300, 250], 'div-gpt-ad-Synonyms_IA_300x250_A').addService(googletag.pubads());
+    googletag.defineSlot('/52304935/Synonyms_IA_300x250_B', [300, 250], 'div-gpt-ad-Synonyms_IA_300x250_B').addService(googletag.pubads());
+    googletag.defineSlot('/52304935/Synonyms_LR_300x250_A', mapSizeMRU, 'div-gpt-ad-Synonyms_LR_300x250_A').addService(googletag.pubads());
+    googletag.defineSlot('/52304935/Synonyms_LR_300x250_B', mapSizeMRU, 'div-gpt-ad-Synonyms_LR_300x250_B').addService(googletag.pubads());
+    googletag.defineSlot('/52304935/Synonyms_LR_300x250_C', mapSizeMRU, 'div-gpt-ad-Synonyms_LR_300x250_C').addService(googletag.pubads());
+    googletag.defineSlot('/52304935/Synonyms_LR_300x250_D', mapSizeMRU, 'div-gpt-ad-Synonyms_LR_300x250_D').addService(googletag.pubads());
+    googletag.defineSlot('/52304935/Synonyms_LR_125x125', [125, 125], 'div-gpt-ad-Synonyms_LR_125x125').addService(googletag.pubads());
+
+    googletag.defineSlot('/52304935/Synonyms_1x1_Slider', [1, 1], 'div-gpt-ad-Synonyms_1x1_Slider').addService(googletag.pubads());
+    
+    pbjs.que.push(function () {
+      pbjs.setTargetingForGPTAsync();
+    });
+
+    googletag.pubads().enableSingleRequest();
+    googletag.pubads().collapseEmptyDivs();
+    googletag.enableServices();
+  });
+
+</script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>test synonyms</title>
+<meta name="description" content="Synonyms for test at Synonyms.net with free online thesaurus, antonyms, definitions and translations.">
+<meta name="keywords" content="test synonym, test synonyms, test antonyms, test thesaurus, synonyms for test, antonyms for test">
+	<meta name="viewport" content="width=device-width">
+<base href="http://www.synonyms.net/">
+<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Serif:400,700,400italic,700italic|Droid+Sans+Mono|Yanone+Kaffeesatz:200,300,400,700|Goudy+Bookletter+1911|Lobster+Two:400,700,400italic,700italic|">
+<link rel="stylesheet" href="root/app_common/css/bootstrap.min.css">
+<!--<link rel="stylesheet" href="--><!--/app_common/css/normalize.css">-->
+<link rel="stylesheet" href="root/app_common/css/smoothness/jquery-ui-1.11.3.custom.min.css">
+<link rel="stylesheet" href="root/app_common/css/syno.css">
+<!--[if lt IE 9]> <link rel="stylesheet" href="root/app_common/css/syno-ie8.css"> <![endif]-->
+<!--[if lt IE 8]> <link rel="stylesheet" href="root/app_common/css/syno-ie7.css"> <![endif]-->
+<link rel="stylesheet" href="root/app_common/css/helpers.css">
+<link rel="stylesheet" href="root/app_common/css/media.css">
+<link rel="shortcut icon" type="image/x-icon" href="root/app_common/img/favicon_syno.ico">
+<link rel="search" type="application/opensearchdescription+xml" title="Synonyms.net" href="http://www.synonyms.net/open-search.xml">
+
+<!--[if lt IE 9]>
+<script src="root/app_common/js/libs/modernizr-2.8.3.custom.min.js"></script>
+<script src="root/app_common/js/libs/html5shiv.min.js"></script>
+<script src="root/app_common/js/libs/respond.min.js"></script>
+<![endif]--><script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-172613-2']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script><meta property="fb:app_id" content="256377701138813"/>
+<meta name="google-signin-client_id" content="567628204450-re7js7ql93f3jtf7g7gnk0mbu9joeqqk.apps.googleusercontent.com">
+</head>
+<body id="s4-page-synonym-en" data-fb="256377701138813" data-atp="ra-4f75bf3d5305fac2" data-prefix="">
+<!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=256377701138813&version=v2.3";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div id="page-container">
+<header id="header">
+	<div id="header-int" class="clearfix">		
+					<div id="user-login"><a href="login.php">Login</a></div>
+				<div id="network-header"><span id="network-header-trigger">The&nbsp;STANDS4&nbsp;Network<span class="arw">&#9776;</span></span>
+	<ul id="network-header-links" style="display:none;">
+		<li class="nw-abbreviations"><a href="http://www.abbreviations.com/">ABBREVIATIONS</a></li>
+		<li class="nw-anagrams"><a href="http://www.anagrams.net/">ANAGRAMS</a></li>
+		<li class="nw-biographies"><a href="http://www.biographies.net/">BIOGRAPHIES</a></li>
+		<li class="nw-convert"><a href="http://www.convert.net/">CONVERSIONS</a></li>
+		<li class="nw-definitions"><a href="http://www.definitions.net/">DEFINITIONS</a></li>
+		<li class="nw-grammar"><a href="http://www.grammar.com/">GRAMMAR</a></li>
+		<li class="nw-lyrics"><a href="http://www.lyrics.com/">LYRICS</a></li>
+		<li class="nw-phrases"><a href="http://www.phrases.net/">PHRASES</a></li>
+		<li class="nw-poetry"><a href="http://www.poetry.net/">POETRY</a></li>
+		<li class="nw-quotes"><a href="http://www.quotes.net/">QUOTES</a></li>
+		<li class="nw-references"><a href="http://www.references.net/">REFERENCES</a></li>
+		<li class="nw-rhymes"><a href="http://www.rhymes.net/">RHYMES</a></li>
+		<li class="nw-scripts"><a href="http://www.scripts.com/">SCRIPTS</a></li>
+		<li class="nw-symbols"><a href="http://www.symbols.com/">SYMBOLS</a></li>
+		<li class="nw-synonyms"><a href="http://www.synonyms.net/">SYNONYMS</a></li>
+		<li class="nw-uszip"><a href="http://www.uszip.com/">USZIP</a></li>
+	</ul>
+</div>	</div>
+</header><div id="main" role="main" class="container">
+<div id="content-top" class="content-top">
+	<div class="view-desktop hidden-xs">
+		<form id="search-frm" method="get" action="subserp.php">
+<input type="hidden" id="page-word-search-lang" name="lang" value="EN">
+<div id="page-top-search" class="rc5">
+	<div id="page-word-search">
+		<input type="text" id="page-word-search-query" class="rc5" name="st" value="test" placeholder="&#83;&#101;&#97;&#114;&#99;&#104;&#32;&#102;&#111;&#114;&#32;&#115;&#121;&#110;&#111;&#110;&#121;&#109;&#115;&#32;&#97;&#110;&#100;&#32;&#97;&#110;&#116;&#111;&#110;&#121;&#109;&#115;..." autocomplete="off">
+		<div id="page-word-search-icon"></div>
+		<button type="submit" class="btn primary" id="page-word-search-button">&#83;&#101;&#97;&#114;&#99;&#104;</button>
+	</div>
+	<div id="page-word-search-ops">
+		<div><input type="radio" class="custom-rb" name="qtype" id="page-word-search-op1" value="1" checked="checked"><label for="page-word-search-op1"><span>Term</span> &raquo; <span>Synonyms</span></label></div>
+		<div><input type="radio" class="custom-rb" name="qtype" id="page-word-search-op2" value="2"><label for="page-word-search-op2"><span>Term</span> &raquo; <span>Antonyms</span></label></div>
+	</div>
+</div>
+<div id="page-letter-search" class="rc5"><a href="/synonyms/0">#</a><a href="/synonyms/A">A</a><a href="/synonyms/B">B</a><a href="/synonyms/C">C</a><a href="/synonyms/D">D</a><a href="/synonyms/E">E</a><a href="/synonyms/F">F</a><a href="/synonyms/G">G</a><a href="/synonyms/H">H</a><a href="/synonyms/I">I</a><a href="/synonyms/J">J</a><a href="/synonyms/K">K</a><a href="/synonyms/L">L</a><a href="/synonyms/M">M</a><a href="/synonyms/N">N</a><a href="/synonyms/O">O</a><a href="/synonyms/P">P</a><a href="/synonyms/Q">Q</a><a href="/synonyms/R">R</a><a href="/synonyms/S">S</a><a href="/synonyms/T">T</a><a href="/synonyms/U">U</a><a href="/synonyms/V">V</a><a href="/synonyms/W">W</a><a href="/synonyms/X">X</a><a href="/synonyms/Y">Y</a><a href="/synonyms/Z">Z</a><span class="vbar">&nbsp;</span><a href="justadded.php" class="z">NEW</a><a href="random.php" class="z">&#82;&#65;&#78;&#68;&#79;&#77;</a></div>
+</form>		<div id="page-top-logo" onclick="location.href='http://www.synonyms.net/';"><img src="root/app_common/img/top_logo_syn.png" alt="Synonyms.net" title="Synonyms.net"></div>
+	</div>
+	<div class="view-mobile visible-xs">
+		<form id="search-frm" method="get" action="subserp.php">
+	<div id="page-top-search" class="rc5">
+		<div id="page-word-search">
+			<input type="text" id="page-word-search-query" class="rc5" name="st" value="test" autocomplete="off">
+			<div id="page-word-search-icon"></div>
+			<button type="submit" class="btn primary" id="page-word-search-button">Search</button>
+		</div>
+		<div id="page-word-search-ops">
+			<div><input type="radio" class="custom-rb" name="qtype" id="page-word-search-m-op1" value="1" checked="checked"><label for="page-word-search-m-op1"><span>Term</span> &raquo; <span>Synonyms</span></label></div>
+			<div><input type="radio" class="custom-rb" name="qtype" id="page-word-search-m-op2" value="2"><label for="page-word-search-m-op2"><span>Term</span> &raquo; <span>Antonyms</span></label></div>
+		</div>
+	</div>
+	<div id="page-letter-search" class="rc5"><a href="/synonyms/0">#</a><a href="/synonyms/A">A</a><a href="/synonyms/B">B</a><a href="/synonyms/C">C</a><a href="/synonyms/D">D</a><a href="/synonyms/E">E</a><a href="/synonyms/F">F</a><a href="/synonyms/G">G</a><a href="/synonyms/H">H</a><a href="/synonyms/I">I</a><a href="/synonyms/J">J</a><a href="/synonyms/K">K</a><a href="/synonyms/L">L</a><a href="/synonyms/M">M</a><a href="/synonyms/N">N</a><a href="/synonyms/O">O</a><a href="/synonyms/P">P</a><a href="/synonyms/Q">Q</a><a href="/synonyms/R">R</a><a href="/synonyms/S">S</a><a href="/synonyms/T">T</a><a href="/synonyms/U">U</a><a href="/synonyms/V">V</a><a href="/synonyms/W">W</a><a href="/synonyms/X">X</a><a href="/synonyms/Y">Y</a><a href="/synonyms/Z">Z</a><span class="vbar">&nbsp;</span><a href="justadded.php" class="z">NEW</a><a href="random.php" class="z">&#82;&#65;&#78;&#68;&#79;&#77;</a></div>
+</form>		<div id="page-top-logo" onclick="location.href='http://www.synonyms.net/';"><img src="root/app_common/img/top_logo_syn.png" alt="Synonyms.net" title="Synonyms.net"></div>
+	</div>
+</div>
+
+<div class="row">
+
+	<div id="content-main" class="col-sm-8 col-sm-push-4">
+		
+		<div class="row">
+			<div class="col-xs-12 col-sm-12">
+				<div class="category-header clearfix">
+					<div class="sub-category-header-icon hidden-xs"><i class="fa fa-question-circle fa-3x"></i></div>
+					<hgroup>
+						<div style="position:relative;float:right;top:1px;right:1px"><div class="fb-like" data-href="" data-width="" data-height="" data-colorscheme="light" data-layout="button" data-action="like" data-show-faces="true" data-send="false"></div></div>						<div style="position:relative;float:right;top:6px;right:13px">
+							<p id="print-style-icon">
+								<a target="_blank" href="print.php?term=test" class="rc3 s"  title="click to send test to your printer"><span class="glyphicon glyphicon-print"></span></a>&nbsp;
+								<a href="myvocabulary.php?add=test" class="rc3 s"  title="click to add test to your vocabulary"><i class="fa fa-list-ul fa-1x"></i> Vocabulary</a>
+							</p>
+						</div>
+						<h3><a href="http://www.synonyms.net/synonym/test">What are some alternative words for <strong>test</strong>?</a></h3>
+						<h2>&#83;&#121;&#110;&#111;&#110;&#121;&#109;&#115;&#32;&#102;&#111;&#114; <span class="hl"><strong>test</strong></span><span class="pron">tɛst</span><img class="tts-icon" data-lang="EN" data-term="test" id="definition-tts" src="root/app_common/img/audio_syn.png" alt="Say it" title="Say it" style="display:none;"><span class="tts-player" id="definition-tts-player"></span></h2>
+						<h4>This thesaurus page is about all possible synonyms, equivalent, same meaning and similar words for the term <strong>test</strong>.</h4>
+					</hgroup>
+				</div>
+			</div>
+		</div>
+
+
+		<div id="content-body" class="row">
+
+			<div class="col-xs-12 col-sm-12">
+									
+					<div class="row">
+						<div class="adunit-middle adunit-middle-2col clearfix">
+							<div class="hidden-xs col-xs-12 col-sm-6"><!-- <script src="/S4/app_abbreviations/js/ads.js"></script> -->
+<script src="/js/ads.js"></script>
+
+<script>
+var scriptTag = document.getElementsByTagName('script');
+scriptTag = scriptTag[scriptTag.length - 1];
+var parentTag1 = scriptTag.parentNode;
+
+if( window.canRunAds === undefined )	{
+	var scriptElem = document.createElement('script');
+	scriptElem.type = 'text/javascript';
+    scriptElem.async = false;
+    scriptElem.onload = function(){
+    	parentTag1.innerHTML = "<!-- SYN_NEW_TRANS_TEXT_ONLY_300_250 --><ins class='adsbygoogle' style='display:inline-block;width:300px;height:250px' data-ad-client='ca-pub-6071864913982699' data-ad-slot='5855281944'></ins>";
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    };
+    scriptElem.src = '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+    document.getElementsByTagName('head')[0].appendChild(scriptElem);
+    
+}else{
+
+	parentTag1.innerHTML = "<div id='div-gpt-ad-Synonyms_IA_300x250_B'></div>";
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_IA_300x250_B'); });
+	
+}
+</script></div>
+							<center>
+							<div class="col-xs-12 col-sm-6"><!-- <script src="/S4/app_abbreviations/js/ads.js"></script> -->
+<script src="/js/ads.js"></script>
+
+<script>
+var scriptTag = document.getElementsByTagName('script');
+scriptTag = scriptTag[scriptTag.length - 1];
+var parentTag2 = scriptTag.parentNode;
+
+if( window.canRunAds === undefined )	{
+	var scriptElem = document.createElement('script');
+	scriptElem.type = 'text/javascript';
+    scriptElem.async = false;
+    scriptElem.onload = function(){
+    	parentTag2.innerHTML = "<!-- SYN_NEW_TRANS_TEXT_ONLY_300_250 --><ins class='adsbygoogle' style='display:inline-block;width:300px;height:250px' data-ad-client='ca-pub-6071864913982699' data-ad-slot='5855281944'></ins>";
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    };
+    scriptElem.src = '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+    document.getElementsByTagName('head')[0].appendChild(scriptElem);
+    
+}else{
+
+	parentTag2.innerHTML = "<div id='div-gpt-ad-Synonyms_IA_300x250_A'></div>";
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_IA_300x250_A'); });
+	
+}
+</script></div>
+							</center>
+						</div>
+					</div>
+
+					<section id="definitions-list" class="clearfix">
+						<div class="rc5"><h3 class="row"><span class="col-xs-6 col-sm-6">Princeton's WordNet</span><span class="col-xs-6 col-sm-6"><span id="quote-rate-text" class="rank-icon-suffix hidden-xs">(0.00 / 0 votes)</span><span id="quote-rate" class="rank-icon" title="rate it" data-dicid="synonyms" data-defid="181841,181842,181843,181844,181845,181846,181847,181848,181849,181850,181851,181852,181853" data-def="test" data-antid="" data-type="1" data-nv="0" data-score="0.00"><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span></span><span class="rank-icon-prefix hidden-xs">Rate these synonyms:</span></span></h3><ol><li><p class="term">trial, trial run, test, tryout<span class="pos">(noun)</span></p><p class="desc">trying something to find out about it</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/mental test">mental test</a>, <a href="http://www.synonyms.net/synonym/tryout">tryout</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/tribulation">tribulation</a>, <a href="http://www.synonyms.net/synonym/exam">exam</a>, <a href="http://www.synonyms.net/synonym/audition">audition</a>, <a href="http://www.synonyms.net/synonym/psychometric test">psychometric test</a>, <a href="http://www.synonyms.net/synonym/mental testing">mental testing</a>, <a href="http://www.synonyms.net/synonym/visitation">visitation</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/trial run">trial run</a>, <a href="http://www.synonyms.net/synonym/run">run</a></p></li><li><p class="term">test, mental test, mental testing, psychometric test<span class="pos">(noun)</span></p><p class="desc">any standardized procedure for measuring sensitivity or memory or intelligence or aptitude or personality etc</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/tryout">tryout</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/mental test">mental test</a>, <a href="http://www.synonyms.net/synonym/exam">exam</a>, <a href="http://www.synonyms.net/synonym/psychometric test">psychometric test</a>, <a href="http://www.synonyms.net/synonym/mental testing">mental testing</a>, <a href="http://www.synonyms.net/synonym/trial run">trial run</a>, <a href="http://www.synonyms.net/synonym/run">run</a></p></li><li><p class="term">examination, exam, test<span class="pos">(noun)</span></p><p class="desc">a set of questions or exercises evaluating skill or knowledge</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/scrutiny">scrutiny</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/tryout">tryout</a>, <a href="http://www.synonyms.net/synonym/psychometric test">psychometric test</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/mental test">mental test</a>, <a href="http://www.synonyms.net/synonym/exam">exam</a>, <a href="http://www.synonyms.net/synonym/examen">examen</a>, <a href="http://www.synonyms.net/synonym/interrogation">interrogation</a>, <a href="http://www.synonyms.net/synonym/mental testing">mental testing</a>, <a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/run">run</a>, <a href="http://www.synonyms.net/synonym/interrogatory">interrogatory</a>, <a href="http://www.synonyms.net/synonym/trial run">trial run</a>, <a href="http://www.synonyms.net/synonym/testing">testing</a></p></li><li><p class="term">test, trial<span class="pos">(noun)</span></p><p class="desc">the act of undergoing testing</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/tryout">tryout</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/mental test">mental test</a>, <a href="http://www.synonyms.net/synonym/exam">exam</a>, <a href="http://www.synonyms.net/synonym/psychometric test">psychometric test</a>, <a href="http://www.synonyms.net/synonym/mental testing">mental testing</a>, <a href="http://www.synonyms.net/synonym/visitation">visitation</a>, <a href="http://www.synonyms.net/synonym/trial run">trial run</a>, <a href="http://www.synonyms.net/synonym/run">run</a>, <a href="http://www.synonyms.net/synonym/tribulation">tribulation</a></p></li><li><p class="term">test, trial, run<span class="pos">(noun)</span></p><p class="desc">the act of testing something</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/exam">exam</a>, <a href="http://www.synonyms.net/synonym/running game">running game</a>, <a href="http://www.synonyms.net/synonym/ladder">ladder</a>, <a href="http://www.synonyms.net/synonym/ravel">ravel</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/political campaign">political campaign</a>, <a href="http://www.synonyms.net/synonym/rill">rill</a>, <a href="http://www.synonyms.net/synonym/running play">running play</a>, <a href="http://www.synonyms.net/synonym/outpouring">outpouring</a>, <a href="http://www.synonyms.net/synonym/tryout">tryout</a>, <a href="http://www.synonyms.net/synonym/tally">tally</a>, <a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/discharge">discharge</a>, <a href="http://www.synonyms.net/synonym/campaign">campaign</a>, <a href="http://www.synonyms.net/synonym/footrace">footrace</a>, <a href="http://www.synonyms.net/synonym/foot race">foot race</a>, <a href="http://www.synonyms.net/synonym/trial run">trial run</a>, <a href="http://www.synonyms.net/synonym/run">run</a>, <a href="http://www.synonyms.net/synonym/visitation">visitation</a>, <a href="http://www.synonyms.net/synonym/tribulation">tribulation</a>, <a href="http://www.synonyms.net/synonym/streak">streak</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/psychometric test">psychometric test</a>, <a href="http://www.synonyms.net/synonym/rivulet">rivulet</a>, <a href="http://www.synonyms.net/synonym/mental test">mental test</a>, <a href="http://www.synonyms.net/synonym/runnel">runnel</a>, <a href="http://www.synonyms.net/synonym/streamlet">streamlet</a>, <a href="http://www.synonyms.net/synonym/mental testing">mental testing</a>, <a href="http://www.synonyms.net/synonym/running">running</a></p></li><li><p class="term">test<span class="pos">(verb)</span></p><p class="desc">a hard outer covering as of some amoebas and sea urchins</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/tryout">tryout</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/mental test">mental test</a>, <a href="http://www.synonyms.net/synonym/exam">exam</a>, <a href="http://www.synonyms.net/synonym/psychometric test">psychometric test</a>, <a href="http://www.synonyms.net/synonym/mental testing">mental testing</a>, <a href="http://www.synonyms.net/synonym/trial run">trial run</a>, <a href="http://www.synonyms.net/synonym/run">run</a></p></li><li><p class="term">test, prove, try, try out, examine, essay<span class="pos">(verb)</span></p><p class="desc">put to the test, as for its quality, or give experimental use to</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/audition">audition</a>, <a href="http://www.synonyms.net/synonym/rise">rise</a>, <a href="http://www.synonyms.net/synonym/analyze">analyze</a>, <a href="http://www.synonyms.net/synonym/leaven">leaven</a>, <a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/sample">sample</a>, <a href="http://www.synonyms.net/synonym/show">show</a>, <a href="http://www.synonyms.net/synonym/testify">testify</a>, <a href="http://www.synonyms.net/synonym/establish">establish</a>, <a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/evidence">evidence</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a>, <a href="http://www.synonyms.net/synonym/study">study</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/see">see</a>, <a href="http://www.synonyms.net/synonym/seek">seek</a>, <a href="http://www.synonyms.net/synonym/try on">try on</a>, <a href="http://www.synonyms.net/synonym/probe">probe</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/attempt">attempt</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/raise">raise</a>, <a href="http://www.synonyms.net/synonym/adjudicate">adjudicate</a>, <a href="http://www.synonyms.net/synonym/render">render</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/shew">shew</a>, <a href="http://www.synonyms.net/synonym/judge">judge</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/taste">taste</a>, <a href="http://www.synonyms.net/synonym/turn out">turn out</a>, <a href="http://www.synonyms.net/synonym/demonstrate">demonstrate</a>, <a href="http://www.synonyms.net/synonym/turn up">turn up</a>, <a href="http://www.synonyms.net/synonym/experiment">experiment</a>, <a href="http://www.synonyms.net/synonym/strain">strain</a>, <a href="http://www.synonyms.net/synonym/analyse">analyse</a>, <a href="http://www.synonyms.net/synonym/stress">stress</a>, <a href="http://www.synonyms.net/synonym/hear">hear</a>, <a href="http://www.synonyms.net/synonym/canvass">canvass</a>, <a href="http://www.synonyms.net/synonym/assay">assay</a>, <a href="http://www.synonyms.net/synonym/canvas">canvas</a>, <a href="http://www.synonyms.net/synonym/bear witness">bear witness</a></p></li><li><p class="term">screen, test<span class="pos">(verb)</span></p><p class="desc">test or examine for the presence of disease or infection</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/sieve">sieve</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/riddle">riddle</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/block out">block out</a>, <a href="http://www.synonyms.net/synonym/sort">sort</a>, <a href="http://www.synonyms.net/synonym/shield">shield</a>, <a href="http://www.synonyms.net/synonym/screen out">screen out</a></p></li><li><p class="term">quiz, test<span class="pos">(verb)</span></p><p class="desc">examine someone's knowledge of something</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/test">test</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a></p></li><li><p class="term">test<span class="pos">(verb)</span></p><p class="desc">show a certain characteristic when tested</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a></p></li><li><p class="term">test<span class="pos">(verb)</span></p><p class="desc">achieve a certain score or rating on a test</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a></p></li><li><p class="term">test<span class="pos">(verb)</span></p><p class="desc">determine the presence or properties of (a substance)</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a></p></li><li><p class="term">test<span class="pos">(verb)</span></p><p class="desc">undergo a test</p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/screen">screen</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/examine">examine</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/try out">try out</a></p></li></ol></div>						<div class="rc5" style="margin-top:20px;"><h3 class="row"><span class="col-xs-6 col-sm-6">Wiktionary</span><span class="col-xs-6 col-sm-6"><span id="quote-rate-text" class="rank-icon-suffix hidden-xs">(0.00 / 0 votes)</span><span id="quote-rate" class="rank-icon" title="rate it" data-dicid="wikt_syn_ant" data-defid="test" data-def="test" data-type="1" data-nv="0" data-score="0.00"><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span></span><span class="rank-icon-prefix hidden-xs">Rate these synonyms:</span></span></h3><ol><li class="sfer"><p class="term">test<span class="pos">(noun)</span></p><div class="desc">To challenge.</div><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/challenge">challenge</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a></p><p class="ants"><strong>Antonyms:</strong><br><a href="http://www.synonyms.net/synonym/breeze">breeze</a></p></li><li class="sfer"><p class="term">test<span class="pos">(noun)</span></p><div class="desc"></div><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/quiz">quiz</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a></p><p class="ants"><strong>Antonyms:</strong><br><a href="http://www.synonyms.net/synonym/recess">recess</a></p></li></ol></div>																		<div class="rc5" style="margin-top:20px;"><h3 class="row"><span class="col-xs-6 col-sm-6">Dictionary of English Synonymes</span><span class="col-xs-6 col-sm-6"><span id="quote-rate-text" class="rank-icon-suffix hidden-xs">(0.00 / 0 votes)</span><span id="quote-rate" class="rank-icon" title="rate it" data-dicid="syn_soule" data-defid="test" data-def="test" data-type="1" data-nv="0" data-score="0.00"><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span></span><span class="rank-icon-prefix hidden-xs">Rate these synonyms:</span></span></h3><ol><li class="sfer"><p class="term">test<span class="pos">(n.)</span></p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/experiment">experiment</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/proof">proof</a>, <a href="http://www.synonyms.net/synonym/ordeal">ordeal</a></p></li><li class="sfer"><p class="term">test<span class="pos">(n.)</span></p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/criterion">criterion</a>, <a href="http://www.synonyms.net/synonym/standard">standard</a>, <a href="http://www.synonyms.net/synonym/touchstone">touchstone</a></p></li><li class="sfer"><p class="term">test<span class="pos">(n.)</span></p><p class="syns"><strong>Synonyms:</strong><br>[<i>Chem.</i>] <a href="http://www.synonyms.net/synonym/reägent">reägent</a></p></li><li class="sfer"><p class="term">test<span class="pos">(v. a.)</span></p><p class="syns"><strong>Synonyms:</strong><br><a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/subject to trial">subject to trial</a>, <a href="http://www.synonyms.net/synonym/put to the proof">put to the proof</a>, <a href="http://www.synonyms.net/synonym/experiment upon">experiment upon</a>, <a href="http://www.synonyms.net/synonym/make trial of">make trial of</a>, <a href="http://www.synonyms.net/synonym/make an experiment with">make an experiment with</a>, <a href="http://www.synonyms.net/synonym/give a trial to">give a trial to</a></p></li></ol></div>						<div class="rc5" style="margin-top:20px;"><h3 class="row"><span class="col-xs-6 col-sm-6"><a rel="nofollow" href="http://paraphrase.org/" target="_blank">PPDB, the paraphrase database</a></span><span class="col-xs-6 col-sm-6"><span id="quote-rate-text" class="rank-icon-suffix hidden-xs">(0.00 / 0 votes)</span><span id="quote-rate" class="rank-icon" title="rate it" data-dicid="paraphrases" data-defid="test" data-def="test" data-type="1" data-nv="0" data-score="0.00"><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span><span class="se"></span></span><span class="rank-icon-prefix hidden-xs">Rate these synonyms:</span></span></h3><p class="desc">List of paraphrases:</p><p class="syns"><a href="http://www.synonyms.net/synonym/testing">testing</a>, <a href="http://www.synonyms.net/synonym/tests">tests</a>, <a href="http://www.synonyms.net/synonym/trial">trial</a>, <a href="http://www.synonyms.net/synonym/tester">tester</a>, <a href="http://www.synonyms.net/synonym/check">check</a>, <a href="http://www.synonyms.net/synonym/assay">assay</a>, <a href="http://www.synonyms.net/synonym/criterion">criterion</a>, <a href="http://www.synonyms.net/synonym/evidence">evidence</a>, <a href="http://www.synonyms.net/synonym/proof">proof</a>, <a href="http://www.synonyms.net/synonym/trials">trials</a>, <a href="http://www.synonyms.net/synonym/essay">essay</a>, <a href="http://www.synonyms.net/synonym/probationary">probationary</a>, <a href="http://www.synonyms.net/synonym/tested">tested</a>, <a href="http://www.synonyms.net/synonym/evidentiary">evidentiary</a>, <a href="http://www.synonyms.net/synonym/ordeal">ordeal</a>, <a href="http://www.synonyms.net/synonym/checking">checking</a>, <a href="http://www.synonyms.net/synonym/essai">essai</a>, <a href="http://www.synonyms.net/synonym/pilot">pilot</a>, <a href="http://www.synonyms.net/synonym/verify">verify</a>, <a href="http://www.synonyms.net/synonym/examination">examination</a>, <a href="http://www.synonyms.net/synonym/backprobe">backprobe</a>, <a href="http://www.synonyms.net/synonym/experiment">experiment</a>, <a href="http://www.synonyms.net/synonym/review">review</a>, <a href="http://www.synonyms.net/synonym/prov">prov</a>, <a href="http://www.synonyms.net/synonym/verification">verification</a>, <a href="http://www.synonyms.net/synonym/try">try</a>, <a href="http://www.synonyms.net/synonym/prove">prove</a>, <a href="http://www.synonyms.net/synonym/experimental">experimental</a>, <a href="http://www.synonyms.net/synonym/consideration">consideration</a>, <a href="http://www.synonyms.net/synonym/criteria">criteria</a>, <a href="http://www.synonyms.net/synonym/probation">probation</a>, <a href="http://www.synonyms.net/synonym/inspection">inspection</a>, <a href="http://www.synonyms.net/synonym/essays">essays</a>, <a href="http://www.synonyms.net/synonym/testa">testa</a>, <a href="http://www.synonyms.net/synonym/touchstone">touchstone</a></pl></div>						
+					</section>
+
+					
+						<section id="vis-cont" class="clearfix" data-term="test" style="display:none;">
+							<hgroup>
+								<h2>Visual Synonyms of <strong>test</strong></h2>
+							</hgroup>
+							<div id="vis-int" class="rc5"></div>
+							<div id="vis-legend" class="rc5">
+								<div class="col-xs-12"><span><strong>Legend:</span></strong></div>
+								<div class="col-xs-6"><div class="swatch" style="background-color:#BCE099;"></div> <span>Noun</span></div>
+								<div class="col-xs-6"><div class="swatch" style="background-color:#9DB9E5;"></div> <span>Verb</span></div>
+								<div class="col-xs-6"><div class="swatch" style="background-color:#E5C39D;"></div> <span>Adjective</span></div>
+								<div class="col-xs-6"><div class="swatch" style="background-color:#E59DDA;"></div> <span>Adverb</span></div>
+							</div>
+						</section>
+
+					
+
+					
+						<hr>
+
+						<div>
+							<section id="translations-list" class="clearfix">
+								<hgroup>
+									<h1>Translations for <strong>test</strong></h1>
+									<h3>From our Multilingual Translation Dictionary</h3>
+								</hgroup>
+								<div class="rc5"><ul><li class="clearfix"><span class="trn">اختبار, امتحان</span><span class="lng"><a href="/translate/test/ar">Arabic</a><a href="/translate/test/ar"><img src="root/app_common/img/flags/sa_16.png"></a></span></li><li class="clearfix"><span class="trn">provar</span><span class="lng"><a href="/translate/test/ca">Catalan, Valencian</a><a href="/translate/test/ca"><img src="root/app_common/img/flags/ca_16.png"></a></span></li><li class="clearfix"><span class="trn">test, testovat, zkouška</span><span class="lng"><a href="/translate/test/cs">Czech</a><a href="/translate/test/cs"><img src="root/app_common/img/flags/cz_16.png"></a></span></li><li class="clearfix"><span class="trn">prøve</span><span class="lng"><a href="/translate/test/da">Danish</a><a href="/translate/test/da"><img src="root/app_common/img/flags/dk_16.png"></a></span></li><li class="clearfix"><span class="trn">Test, Examen, Prüfung, Probe</span><span class="lng"><a href="/translate/test/de">German</a><a href="/translate/test/de"><img src="root/app_common/img/flags/de_16.png"></a></span></li><li class="clearfix"><span class="trn">δοκιμάζω, δοκιμή, εξέταση, θέτω υπό δοκιμασία, εξετάζω, διαγώνισμα, δοκιμασία</span><span class="lng"><a href="/translate/test/el">Greek</a><a href="/translate/test/el"><img src="root/app_common/img/flags/gr_16.png"></a></span></li><li class="clearfix"><span class="trn">ekzameno</span><span class="lng"><a href="/translate/test/eo">Esperanto</a><a href="/translate/test/eo"><img src="root/app_common/img/flags/eo_16.png"></a></span></li><li class="clearfix"><span class="trn">probar, test, testear, prueba, examen, examinar</span><span class="lng"><a href="/translate/test/es">Spanish</a><a href="/translate/test/es"><img src="root/app_common/img/flags/es_16.png"></a></span></li><li class="clearfix"><span class="trn">تست, آزمایش</span><span class="lng"><a href="/translate/test/fa">Persian</a><a href="/translate/test/fa"><img src="root/app_common/img/flags/ir_16.png"></a></span></li><li class="clearfix"><span class="trn">testata, tentti, haastaa, käyttökoe, koetus, järjestää, koestaa, testi, koe, kuori</span><span class="lng"><a href="/translate/test/fi">Finnish</a><a href="/translate/test/fi"><img src="root/app_common/img/flags/fi_16.png"></a></span></li><li class="clearfix"><span class="trn">mettre à l'épreuve, examen, épreuve, tester, test</span><span class="lng"><a href="/translate/test/fr">French</a><a href="/translate/test/fr"><img src="root/app_common/img/flags/fr_16.png"></a></span></li><li class="clearfix"><span class="trn">tástáil, scrúdú</span><span class="lng"><a href="/translate/test/ga">Irish</a><a href="/translate/test/ga"><img src="root/app_common/img/flags/ph_16.png"></a></span></li><li class="clearfix"><span class="trn">feuchainn, feuch, dearbhadh</span><span class="lng"><a href="/translate/test/gd">Scottish Gaelic</a><a href="/translate/test/gd"><img src="root/app_common/img/flags/ph_16.png"></a></span></li><li class="clearfix"><span class="trn">מבחן</span><span class="lng"><a href="/translate/test/he">Hebrew</a><a href="/translate/test/he"><img src="root/app_common/img/flags/il_16.png"></a></span></li><li class="clearfix"><span class="trn">चुनौती, परीक्षा, परीक्षण</span><span class="lng"><a href="/translate/test/hi">Hindi</a><a href="/translate/test/hi"><img src="root/app_common/img/flags/in_16.png"></a></span></li><li class="clearfix"><span class="trn">vizsgál, vizsgáztat, vizsgálat, kihív, vizsga, vizsgázik, teszt, próba, tesztel</span><span class="lng"><a href="/translate/test/hu">Hungarian</a><a href="/translate/test/hu"><img src="root/app_common/img/flags/hu_16.png"></a></span></li><li class="clearfix"><span class="trn">uji</span><span class="lng"><a href="/translate/test/id">Indonesian</a><a href="/translate/test/id"><img src="root/app_common/img/flags/id_16.png"></a></span></li><li class="clearfix"><span class="trn">verifica, testare, esame, prova, test</span><span class="lng"><a href="/translate/test/it">Italian</a><a href="/translate/test/it"><img src="root/app_common/img/flags/it_16.png"></a></span></li><li class="clearfix"><span class="trn">מִבְחָן</span><span class="lng"><a href="/translate/test/iw">Hebrew</a><a href="/translate/test/iw"><img src="root/app_common/img/flags/il_16.png"></a></span></li><li class="clearfix"><span class="trn">試練, テストする, テスト, 検査, 試験, 実験, 試す</span><span class="lng"><a href="/translate/test/ja">Japanese</a><a href="/translate/test/ja"><img src="root/app_common/img/flags/jp_16.png"></a></span></li><li class="clearfix"><span class="trn">시험, 테스트, 試驗, 검사</span><span class="lng"><a href="/translate/test/ko">Korean</a><a href="/translate/test/ko"><img src="root/app_common/img/flags/kr_16.png"></a></span></li><li class="clearfix"><span class="trn">test</span><span class="lng"><a href="/translate/test/la">Latin</a><a href="/translate/test/la"><img src="root/app_common/img/flags/ph_16.png"></a></span></li><li class="clearfix"><span class="trn">Prouf</span><span class="lng"><a href="/translate/test/lb">Luxembourgish, Letzeburgesch</a><a href="/translate/test/lb"><img src="root/app_common/img/flags/lb_16.png"></a></span></li><li class="clearfix"><span class="trn">ujian</span><span class="lng"><a href="/translate/test/ms">Malay</a><a href="/translate/test/ms"><img src="root/app_common/img/flags/ph_16.png"></a></span></li><li class="clearfix"><span class="trn">test, proef, examen</span><span class="lng"><a href="/translate/test/nl">Dutch</a><a href="/translate/test/nl"><img src="root/app_common/img/flags/nl_16.png"></a></span></li><li class="clearfix"><span class="trn">test</span><span class="lng"><a href="/translate/test/no">Norwegian</a><a href="/translate/test/no"><img src="root/app_common/img/flags/no_16.png"></a></span></li><li class="clearfix"><span class="trn">sprawdzian, test</span><span class="lng"><a href="/translate/test/pl">Polish</a><a href="/translate/test/pl"><img src="root/app_common/img/flags/pl_16.png"></a></span></li><li class="clearfix"><span class="trn">teste, exame, testar, prova</span><span class="lng"><a href="/translate/test/pt">Portuguese</a><a href="/translate/test/pt"><img src="root/app_common/img/flags/pt_16.png"></a></span></li><li class="clearfix"><span class="trn">probă, examen, test</span><span class="lng"><a href="/translate/test/ro">Romanian</a><a href="/translate/test/ro"><img src="root/app_common/img/flags/ro_16.png"></a></span></li><li class="clearfix"><span class="trn">контрольная работа, тестировать, протестировать, экзамен, тест, испытание, проба, испытывать, испытать</span><span class="lng"><a href="/translate/test/ru">Russian</a><a href="/translate/test/ru"><img src="root/app_common/img/flags/ru_16.png"></a></span></li><li class="clearfix"><span class="trn">prova, proa, proba</span><span class="lng"><a href="/translate/test/sc">Sardinian</a><a href="/translate/test/sc"><img src="root/app_common/img/flags/ph_16.png"></a></span></li><li class="clearfix"><span class="trn">provimi, prova, provë, provim</span><span class="lng"><a href="/translate/test/sq">Albanian</a><a href="/translate/test/sq"><img src="root/app_common/img/flags/ph_16.png"></a></span></li><li class="clearfix"><span class="trn">provning, dugga, tentamen, tenta, prov, test, testa</span><span class="lng"><a href="/translate/test/sv">Swedish</a><a href="/translate/test/sv"><img src="root/app_common/img/flags/se_16.png"></a></span></li><li class="clearfix"><span class="trn">jaribio, majaribio</span><span class="lng"><a href="/translate/test/sw">Swahili</a><a href="/translate/test/sw"><img src="root/app_common/img/flags/sw_16.png"></a></span></li><li class="clearfix"><span class="trn">சோதனை</span><span class="lng"><a href="/translate/test/ta">Tamil</a><a href="/translate/test/ta"><img src="root/app_common/img/flags/ta_16.png"></a></span></li><li class="clearfix"><span class="trn">పరీక్ష</span><span class="lng"><a href="/translate/test/te">Telugu</a><a href="/translate/test/te"><img src="root/app_common/img/flags/in_16.png"></a></span></li><li class="clearfix"><span class="trn">สอบ, ทดสอบ</span><span class="lng"><a href="/translate/test/th">Thai</a><a href="/translate/test/th"><img src="root/app_common/img/flags/th_16.png"></a></span></li><li class="clearfix"><span class="trn">test, sınav, deneme, Ölçek</span><span class="lng"><a href="/translate/test/tr">Turkish</a><a href="/translate/test/tr"><img src="root/app_common/img/flags/tr_16.png"></a></span></li><li class="clearfix"><span class="trn">тест</span><span class="lng"><a href="/translate/test/uk">Ukrainian</a><a href="/translate/test/uk"><img src="root/app_common/img/flags/ua_16.png"></a></span></li><li class="clearfix"><span class="trn">ٹیسٹ</span><span class="lng"><a href="/translate/test/ur">Urdu</a><a href="/translate/test/ur"><img src="root/app_common/img/flags/pk_16.png"></a></span></li><li class="clearfix"><span class="trn">thi, kiểm tra, thử nghiệm</span><span class="lng"><a href="/translate/test/vi">Vietnamese</a><a href="/translate/test/vi"><img src="root/app_common/img/flags/vn_16.png"></a></span></li><li class="clearfix"><span class="trn">פּרובירן</span><span class="lng"><a href="/translate/test/yi">Yiddish</a><a href="/translate/test/yi"><img src="root/app_common/img/flags/il_16.png"></a></span></li><li class="clearfix"><span class="trn">測試</span><span class="lng"><a href="/translate/test/zh">Chinese</a><a href="/translate/test/zh"><img src="root/app_common/img/flags/cn_16.png"></a></span></li></ul></div>								<h3>Get even more <a href="/translate/test">translations for test</a>&nbsp;&raquo;</h3>
+							</section>
+						</div>
+
+										
+					
+					<section class="translate">
+						<hgroup>
+							<h1>Translation</h1>
+							<h4>Find a translation for the <strong></string>test</strong> synonym in other languages:</h4>
+						</hgroup>
+						<div id="term-translations" class="well rc5">
+							<p class="translate-select">Select another language: <select data-source="en" data-apikey="AIzaSyDnwrsw6r1n8CqPRhP9AK8la5o6DMLMDl0" data-term="test" name="tlang" id="trans-lang-select"><option value="">- Select -</option><option value="zh-CN">简体中文 (Chinese - Simplified)</option><option value="zh-TW">繁體中文 (Chinese - Traditional)</option><option value="es">Español (Spanish)</option><option value="ja">日本語 (Japanese)</option><option value="pt">Português (Portuguese)</option><option value="de">Deutsch (German)</option><option value="ar">العربية (Arabic)</option><option value="fr">Français (French)</option><option value="ru">Русский (Russian)</option><option value="kn">ಕನ್ನಡ (Kannada)</option><option value="ko">한국어 (Korean)</option><option value="iw">עברית (Hebrew)</option><option value="uk">Український (Ukrainian)</option><option value="ur">اردو (Urdu)</option><option value="hu">Magyar (Hungarian)</option><option value="hi">मानक हिन्दी (Hindi)</option><option value="id">Indonesia (Indonesian)</option><option value="it">Italiano (Italian)</option><option value="ta">தமிழ் (Tamil)</option><option value="tr">Türkçe (Turkish)</option><option value="te">తెలుగు (Telugu)</option><option value="th">ภาษาไทย (Thai)</option><option value="vi">Tiếng Việt (Vietnamese)</option><option value="cs">Čeština (Czech)</option><option value="pl">Polski (Polish)</option><option value="id">Bahasa Indonesia (Indonesian)</option><option value="ro">Românește (Romanian)</option><option value="nl">Nederlands (Dutch)</option><option value="el">Ελληνικά (Greek)</option><option value="la">Latinum (Latin)</option><option value="sv">Svenska (Swedish)</option><option value="da">Dansk (Danish)</option><option value="fi">Suomi (Finnish)</option><option value="fa">فارسی (Persian)</option><option value="yi">ייִדיש (Yiddish)</option><option value="no">Norsk (Norwegian)</option></select></p>
+						</div>
+					</section>
+
+					<section id="definitions-list" class="clearfix">
+						<div class="rc5" style="margin-top:20px;"><h3 class="row"><span class="col-xs-6 col-sm-6">Images & Illustrations of test</span></h3><ol>&nbsp;<img alt="Images & Illustrations of test" title="Images & Illustrations of test" class="def-illust" src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSumjp6e37O_86nc36mlktuWpbFuCI4nkkkocoBCYW3qCOicqdu_KEK-MY">&nbsp;<img alt="Images & Illustrations of test" title="Images & Illustrations of test" class="def-illust" src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQsfhGxKeVzQL9RZSJg-J28CW2xz6axjmEAiPK1_LFVoxD5IjhW1odPeG-l">&nbsp;<img alt="Images & Illustrations of test" title="Images & Illustrations of test" class="def-illust" src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQpwyzbW_qsRenDw3d4wwpwwm8n99ukMtLCVaPiTJxyviyQVBQeRCglVaY"></ol></div>					</section>
+					
+					<section class="translate">
+
+												<h4>Discuss these <a href="http://www.synonyms.net/synonym/test">test synonyms</a> with the community:</h4>
+
+						<div class="fb-comments-unloaded" data-href="http://www.synonyms.net/synonym/test" data-numposts="5" data-colorscheme="light" data-order-by="reverse_time"></div>
+
+					</section>
+
+					<hr>
+
+					<section id="biblio">
+						<hgroup>
+							<h1>&#67;&#105;&#116;&#97;&#116;&#105;&#111;&#110;</h1>
+							<h2>&#85;&#115;&#101;&#32;&#116;&#104;&#101;&#32;&#99;&#105;&#116;&#97;&#116;&#105;&#111;&#110;&#32;&#98;&#101;&#108;&#111;&#119;&#32;&#116;&#111;&#32;&#97;&#100;&#100;&#32;&#116;&#104;&#101;&#115;&#101;&#32;&#115;&#121;&#110;&#111;&#110;&#121;&#109;&#115;&#32;&#116;&#111;&#32;&#121;&#111;&#117;&#114;&#32;&#98;&#105;&#98;&#108;&#105;&#111;&#103;&#114;&#97;&#112;&#104;&#121;:</h2>
+						</hgroup>
+						<div class="rc5">
+							<p id="cite-style-select" data-term="test" data-ant="0" data-lang="EN"><strong>Style:</strong><a href="javascript:void(0);" class="rc3 s" id="cite-style-select-MLA" data-type="MLA">MLA</a><a href="javascript:void(0);" class="rc3" id="cite-style-select-Chicago" data-type="Chicago">Chicago</a><a href="javascript:void(0);" class="rc3" id="cite-style-select-APA" data-type="APA">APA</a></p>
+							<p id="cite-content"><cite>"test."</cite> <em>Synonyms.net.</em> STANDS4 LLC, 2017. Web. 19 Nov. 2017. &lt;<a href="http://www.synonyms.net/synonym/test" class="force-wrap">http://www.synonyms.net/synonym/test</a>&gt;.</p>
+						</div>
+					</section>
+
+				
+				<div class="callout clearfix row">
+					<div class="callout-int">
+						<div class="row">
+							<div class="col-xs-12 col-sm-8">
+								<hgroup>
+									<h2>Are we missing a good synonym for <strong>test</strong>?</h2>
+								</hgroup>
+							</div>
+							<div class="col-xs-12 col-sm-4">
+								<div class="actions"><button type="button" class="btn primary" onclick="location.href='http://www.synonyms.net/addsynonym.php?entry=test';">Add it Here!</button></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		
+	</div>
+	
+	<div id="content-aside" class="col-sm-4 col-sm-pull-8">
+		
+		<div class="hidden-xs">
+    <hr class="sep">
+<div class="tagline">
+	<h2>The Web's Largest Resource for</h2>
+	<h1>Synonyms <span>&amp;</span> Antonyms</h1>
+</div>    <div class="nsep"><hr><h3>A Member Of The <span>STANDS4 Network</span></h3></div>
+    <div id="sb-social">
+	<div class="clearfix">
+	<div class="social" title="Share this page on Facebook"><a id="share-facebook" href="javascript:void(0);" target="_blank"><div class="fb"></div></a></div>
+	<div class="social" title="Share this page on Twitter"><a id="share-twitter" href="javascript:void(0);" target="_blank"><div class="tw"></div></a></div>
+	<div class="social" title="Share this page on Google+"><a id="share-googleplus" href="javascript:void(0);" target="_blank"><div class="gp"></div></a></div>
+	<div class="social" title="Share this page with AddThis"><a id="share-addthis" href="javascript:void(0);" target="_blank"><div class="at"></div></a></div>
+	</div>
+</div>    <hr class="sep">
+</div>
+		
+					
+<section><script>
+var scriptTag = document.getElementsByTagName('script');
+scriptTag = scriptTag[scriptTag.length - 1];
+var parentTag3 = scriptTag.parentNode;
+
+if( window.canRunAds === undefined )	{
+	var scriptElem = document.createElement('script');
+	scriptElem.type = 'text/javascript';
+    scriptElem.async = false;
+    scriptElem.onload = function(){
+    	parentTag3.innerHTML = "<!-- SYN_NEW_TRANS_TEXT_ONLY_300_600 --><ins class='adsbygoogle' style='display:inline-block;width:300px;height:600px' data-ad-client='ca-pub-6071864913982699' data-ad-slot='2762214747'></ins>";
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    };
+    scriptElem.src = '//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+    document.getElementsByTagName('head')[0].appendChild(scriptElem);
+    
+}else{
+
+	parentTag3.innerHTML = "<div id='div-gpt-ad-Synonyms_LR_300x250_A'></div>";
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_LR_300x250_A'); });
+	
+}
+</script></section>
+<section><!-- /52304935/Synonyms_LR_300x250_B -->
+<div id='div-gpt-ad-Synonyms_LR_300x250_B'>
+<script>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_LR_300x250_B'); });
+</script>
+</div></section>
+<section><!-- /52304935/Synonyms_LR_300x250_C -->
+<div id='div-gpt-ad-Synonyms_LR_300x250_C'>
+<script>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_LR_300x250_C'); });
+</script>
+</div></section>
+<section><!-- /52304935/Synonyms_LR_300x250_D -->
+<div id='div-gpt-ad-Synonyms_LR_300x250_D'>
+<script>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_LR_300x250_D'); });
+</script>
+</div></section>
+				
+				
+						
+			<section class="alt-content">
+				<h4>&#78;&#101;&#97;&#114;&#98;&#121;&#32;&#38;&#32;&#114;&#101;&#108;&#97;&#116;&#101;&#100;&#32;&#101;&#110;&#116;&#114;&#105;&#101;&#115;:</h4>
+				<ul class="ts"><li><a href="http://www.synonyms.net/synonym/tessin">tessin</a></li><li><a href="http://www.synonyms.net/synonym/tessitura">tessitura</a></li><li><a href="http://www.synonyms.net/synonym/tesson">tesson</a></li><li><a href="http://www.synonyms.net/synonym/tessular">tessular</a></li><li><a href="http://www.synonyms.net/synonym/tessy">tessy</a></li><li><a href="http://www.synonyms.net/synonym/test act">test act</a></li><li><a href="http://www.synonyms.net/synonym/test anxiety">test anxiety</a></li><li><a href="http://www.synonyms.net/synonym/test anxiety scale">test anxiety scale</a></li><li><a href="http://www.synonyms.net/synonym/test automation">test automation</a></li><li><a href="http://www.synonyms.net/synonym/test ban">test ban</a></li></ul>			</section>
+			
+						
+						
+			<section class="alt-content">
+				<h4>&#65;&#108;&#116;&#101;&#114;&#110;&#97;&#116;&#105;&#118;&#101;&#32;&#115;&#101;&#97;&#114;&#99;&#104;&#101;&#115;&#32;&#102;&#111;&#114;&#32;<strong>test</strong>:</h4>
+				<ul><li class="es-sy">Search for <a href="http://www.synonyms.net/antonyms/test">Antonyms for <strong>test</strong></a></li><li class="es-sy">Search for <a href="http://www.definitions.net/definition/test">Definitions for <strong>test</strong></a></li><li class="es-sy">Search for <a href="http://www.anagrams.net/test">Anagrams for <strong>test</strong></a></li><li class="es-qt"><a href="http://www.quotes.net/quotations/test">Quotes containing the term <strong>test</strong></a></li><li class="es-qt"><a href="http://www.biographies.net/people//en/test">Biography of <strong>test</strong></a></li><li class="es-ph">Search for <a href="http://www.phrases.net/psearch/test">Phrases containing the term <strong>test</strong></a></li><li class="es-ph">Search for <a href="http://www.poetry.net/psearch/test">Poems containing the term <strong>test</strong></a></li><li class="es-ph">Search for <a href="http://www.scripts.com/psearch/test">Scripts containing the term <strong>test</strong></a></li><li class="es-ab">Search for <a href="http://www.abbreviations.com/serp.php?st=test&qtype=3">Abbreviations containing the term <strong>test</strong></a></li><li class="es-rh"><a href="http://www.rhymes.net/rhyme/test">What rhymes with <strong>test</strong>?</a></li><li class="es-ly">Search for <a href="http://www.lyrics.com/lyrics/test">Song lyrics containing the word <strong>test</strong></a></li><li class="es-az">Search for <strong><a  href="http://www.abbreviations.com/extsearch.php?src=amazon&s=test" rel="nofollow">test</a></strong> on <strong>Amazon</strong></li><li class="es-gg">Search for <strong><a href="http://www.abbreviations.com/extsearch.php?src=google&s=test" rel="nofollow">test</a></strong> on <strong>Google</strong></li></ul>			</section>
+			
+					
+				
+	</div>
+	
+	<div id="thanks-dialog" title="Thank you" style="text-align:center;">
+	  <img src="http://www.synonyms.net/root/app_common/img/sml_logo_syn.png">
+	  <p>Thanks for your vote! We truly appreciate your support.</p>
+	</div>
+	
+</div>
+
+</div>
+<footer id="footer">
+	<div id="footer-int" class="clearfix container-fluid">
+
+		<div class="row">
+			<div class="col-xs-12 col-sm-3">
+				<div class="row">
+					<div class="col-xs-6 col-sm-5">
+						<ul>
+							<h5>Company</h5>
+							<li><a href="http://www.synonyms.net/">Home</a></li>
+							<li><a href="about.php?slc=Synonyms">About</a></li>
+							<li><a href="news.php">News</a></li>
+							<li><a href="press.php">Press</a></li>
+							<li><a href="awards.php">Awards</a></li>
+							<li><a href="testimonials.php">Testimonials</a></li>
+						</ul>
+					</div>
+					<div class="col-xs-6 col-sm-7">
+						<ul>
+							<h5>Editorial</h5>
+							<li><a href="login.php">Login</a></li>
+							<li><a href="addsynonym.php">Add&nbsp;a&nbsp;New&nbsp;Synonym</a></li>
+							<li class="ex"><a href="signup.php">Become an Editor</a></li>
+							<li><a href="editors.php">Meet the Editors</a></li>
+							<li><a href="justadded.php">Recently Added</a></li>
+							<li class="ex"><a href="activity.php">Activity Log</a></li>
+							<li class="ex"><a href="pending.php">Pending&nbsp;Synonyms</a></li>
+							<li class="ex"><a href="pending_antonyms.php">Pending&nbsp;Antonyms</a></li>
+							<li><a href="random.php">Random Entry</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-xs-12 col-sm-4">
+				<div class="row">
+					<div class="col-xs-6 col-sm-6">
+						<ul>
+							<h5>Services</h5>
+							<li><a href="http://www.abbreviations.com/tools.php">Tools</a></li>
+							<li class="ex"><a href="myvocabulary.php">My Vocabulary</a></li>
+							<li><a href="invite.php">Tell a Friend</a></li>
+							<li><a id="page-bookmark" href="">Bookmark Us</a></li>
+							<li class="ex"><a href="wotd.php">Word of the Day</a></li>
+							<li><a href="synonyms_api.php">Synonyms API</a></li>
+						</ul>
+					</div>
+
+					<div class="col-xs-6 col-sm-6">
+						<ul class="last">
+							<h5>Legal &amp; Contact</h5>
+							<li><a href="terms.php">Terms of Use</a></li>
+							<li><a href="privacy.php">Privacy Policy</a></li>
+							<li><a href="contact.php">Contact Us</a></li>
+							<li class="ex"><a href="advertise.php">Advertise</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			
+<div id="s4-network" class="col-xs-12 col-sm-5">
+	<div  class="row">
+		<h5 class="col-xs-12 col-sm-12">The STANDS4 Network</h5>
+	</div>
+
+	<!-- Desktop version -->
+	<div class="clearfix row hidden-xs">
+		<div class="col-xs-12 col-sm-8">
+			<div class="row">
+				<div class="col-xs-6 col-sm-6">
+					<ul>
+						<li class="nw-abbreviations"><a rel="nofollow" href="http://www.abbreviations.com/">Abbreviations</a></li>
+						<li class="nw-convert"><a rel="nofollow" href="http://www.convert.net/">Conversions</a></li>
+						<li class="nw-lyrics"><a rel="nofollow" href="http://www.lyrics.com/">Lyrics</a></li>
+						<li class="nw-poetry"><a rel="nofollow" href="http://www.poetry.net/">Poetry</a></li>
+						<li class="nw-rhymes"><a rel="nofollow" href="http://www.rhymes.net/">Rhymes</a></li>
+						<li class="nw-synonyms"><a rel="nofollow" href="http://www.synonyms.net/">Synonyms</a></li>
+					</ul>
+				</div>
+
+				<div class="col-xs-6 col-sm-6">
+					<ul>
+						<li class="nw-acronyms"><a rel="nofollow" href="http://www.acronyms.com/">Acronyms</a></li>
+						<li class="nw-definitions"><a rel="nofollow" href="http://www.definitions.net/">Definitions</a></li>
+						<li class="nw-math"><a rel="nofollow" href="http://www.math.net/">Math</a></li>
+						<li class="nw-quotes"><a rel="nofollow" href="http://www.quotes.net/">Quotes</a></li>
+						<li class="nw-scripts"><a rel="nofollow" href="http://www.scripts.com/">Scripts</a></li>
+						<li class="nw-ua"><a rel="nofollow" href="http://www.useragents.com/">User Agents</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-xs-12 col-sm-4">
+			<ul class="last">
+				<li class="nw-biographies"><a rel="nofollow" href="http://www.biographies.net/">Biographies</a></li>
+				<li class="nw-grammar"><a rel="nofollow" href="http://www.grammar.com/">Grammar</a></li>
+				<li class="nw-phrases"><a rel="nofollow" href="http://www.phrases.net/">Phrases</a></li>
+				<li class="nw-references"><a rel="nofollow" href="http://www.references.net/">References</a></li>
+				<li class="nw-symbols"><a rel="nofollow" href="http://www.symbols.com/">Symbols</a></li>
+				<li class="nw-uszip"><a rel="nofollow" href="http://www.uszip.com/">Zip Codes</a></li>
+			</ul>
+		</div>
+
+	</div>
+
+	<!-- Mobile version -->
+	<div class="clearfix row hidden-sm hidden-md hidden-lg">
+		<div class="col-xs-12 col-sm-8">
+			<div class="row">
+				<div class="col-xs-6 col-sm-6">
+					<ul>
+						<li class="nw-abbreviations"><a rel="nofollow" href="http://www.abbreviations.com/">Abbreviations</a></li>
+						<li class="nw-acronyms"><a rel="nofollow" href="http://www.acronyms.com/">Acronyms</a></li>
+						<li class="nw-biographies"><a rel="nofollow" href="http://www.biographies.net/">Biographies</a></li>
+						<li class="nw-convert"><a rel="nofollow" href="http://www.convert.net/">Conversions</a></li>
+						<li class="nw-definitions"><a rel="nofollow" href="http://www.definitions.net/">Definitions</a></li>
+						<li class="nw-grammar"><a rel="nofollow" href="http://www.grammar.com/">Grammar</a></li>
+						<li class="nw-lyrics"><a rel="nofollow" href="http://www.lyrics.com/">Lyrics</a></li>
+						<li class="nw-math"><a rel="nofollow" href="http://www.math.net/">Math</a></li>
+						<li class="nw-phrases"><a rel="nofollow" href="http://www.phrases.net/">Phrases</a></li>
+					</ul>
+				</div>
+
+				<div class="col-xs-6 col-sm-6">
+					<ul>
+						<li class="nw-poetry"><a rel="nofollow" href="http://www.poetry.net/">Poetry</a></li>
+						<li class="nw-quotes"><a rel="nofollow" href="http://www.quotes.net/">Quotes</a></li>
+						<li class="nw-references"><a rel="nofollow" href="http://www.references.net/">References</a></li>
+						<li class="nw-rhymes"><a rel="nofollow" href="http://www.rhymes.net/">Rhymes</a></li>
+						<li class="nw-scripts"><a rel="nofollow" href="http://www.scripts.com/">Scripts</a></li>
+						<li class="nw-symbols"><a rel="nofollow" href="http://www.symbols.com/">Symbols</a></li>
+						<li class="nw-synonyms"><a rel="nofollow" href="http://www.synonyms.net/">Synonyms</a></li>
+						<li class="nw-ua"><a rel="nofollow" href="http://www.useragents.com/">User Agents</a></li>
+						<li class="nw-uszip"><a rel="nofollow" href="http://www.uszip.com/">Zip Codes</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="clearfix">
+		<div class="copyright"><strong>&copy; 2001-2017 STANDS4 LLC.</strong><br>All rights reserved.</div>
+		<div id="social-icons">
+			<a rel="nofollow" href="http://www.facebook.com/STANDS4" target="_blank"><div class="social fb"></div></a>
+			<a rel="nofollow" href="http://twitter.com/justadded" target="_blank"><div class="social tw"></div></a>
+			<a rel="nofollow" href="https://plus.google.com/+abbreviations/" rel="publisher" target="_blank"><div class="social gp"></div></a>
+		</div>
+	</div>
+</div>
+		</div>
+
+	</div>
+</footer></div>
+<!--[if gt IE 8]>-->
+<script src="root/app_common/js/libs/modernizr-2.8.3.custom.min.js"></script>
+<!--<![endif]-->
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script>window.jQuery || document.write('<script src="root/app_common/js/libs/jquery-1.11.2.min.js"><\/script>')</script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+<script>window.jQuery || document.write('<script src="root/app_common/js/libs/jquery-ui-1.11.3.custom.min.js"><\/script>')</script>
+
+<script src="root/app_common/js/libs/jquery.placeholder.min.js"></script>
+<script src="root/app_common/js/libs/jit-2.0.1.custom.js"></script>
+<!--[if IE]><script language="javascript" type="text/javascript" src="root/app_common/js/libs/excanvas.custom.js"></script><![endif]-->
+<script src="root/app_common/js/libs/wselect.js"></script>
+
+<script src="https://use.fontawesome.com/1d5fda5f00.js"></script>
+
+<script src="js/syno.js"></script>
+<!-- /52304935/Synonyms_1x1_Slider -->
+<div id='div-gpt-ad-Synonyms_1x1_Slider' style='height:1px; width:1px;'>
+<script>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-Synonyms_1x1_Slider'); });
+</script>
+</div>
+</body>
+</html>
+<!-- Timer: 0.3568 secs | Server: ip-10-113-129-74 -->
